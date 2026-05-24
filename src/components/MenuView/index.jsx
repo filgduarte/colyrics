@@ -7,16 +7,16 @@ import './style.css';
 export default function MenuView() {
     const { view, changeTheme, changeLayout } = useContext(ViewContext);
     const layoutOptions = [
-        { label: 'Editor only', value: 'editor', icon: Brackets },
-        { label: 'Side to Side', value: 'sideToSide', icon: Columns2 },
-        { label: 'Preview only', value: 'preview', icon: Eye },
+        { label: 'Editor only', value: 'editor', icon: Brackets, iconOnly: true },
+        { label: 'Side to Side', value: 'sideToSide', icon: Columns2, iconOnly: true },
+        { label: 'Preview only', value: 'preview', icon: Eye, iconOnly: true },
     ];
     const themeOptions = [
-        { label: 'Light', value: 'light', icon: Sun },
-        { label: 'Dark', value: 'dark', icon: Moon },
+        { label: 'Light', value: 'light', icon: Sun, iconOnly: true },
+        { label: 'Dark', value: 'dark', icon: Moon, iconOnly: true },
     ];
     return (
-        <div className="menu-view">
+        <div id="menu-view" className="app-menu">
             <RadioSwitch
                 options={layoutOptions}
                 name="layout"

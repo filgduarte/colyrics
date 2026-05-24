@@ -5,13 +5,15 @@ import './style.css';
 
 export default function Header() {
     return (
-        <header className="app-header">
-            <div className="logo">
+        <header id="app-header">
+            <div id="app-logo">
                 <img src="./logo.svg" alt="Colyrics" />
             </div>
-            <MenuFile />
-            <MenuView />
-            <MenuHelp />
+            <div id="app-menu">
+                <MenuFile />
+                <MenuView />
+                <MenuHelp />
+            </div>
         </header>
     );
 }

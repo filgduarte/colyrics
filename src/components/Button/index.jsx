@@ -6,7 +6,7 @@ export default function Button({ icon: Icon, ...props }) {
             {
                 Icon && (
                 <Icon
-                    size={props.iconSize ?? 24}
+                    size={props.iconSize ?? 16}
                 />
             )}
             {props.iconOnly !== true && <span>{props.title}</span>}

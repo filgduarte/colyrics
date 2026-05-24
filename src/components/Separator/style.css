@@ -1,0 +1,11 @@
+.separator {
+    padding: 0 0.625rem;
+}
+
+.separator::before {
+    content: '';
+    display: block;
+    width: 1px;
+    height: 1rem;
+    background-color: var(--color-secondary-25);
+}

@@ -1,0 +1,33 @@
+#app-header {
+    display: grid;
+    align-items: center;
+    grid-template-columns: var(--sidebar-width) 1fr;
+    height: var(--header-height);
+    border-bottom: 1px solid var(--color-secondary-25);
+}
+
+#app-header > * {
+    height: 100%;
+}
+
+#app-logo {
+    display: flex;
+    align-items: center;
+    padding-left: 1rem;
+    border-right: 1px solid var(--color-secondary-10);
+
+    img {
+        width: 7rem;
+        height: 1.5rem;
+    }
+}
+
+#app-menu {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+}
+
+#app-menu .app-menu {
+    display: flex;
+    align-items: center;
+}

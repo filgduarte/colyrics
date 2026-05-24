@@ -4,7 +4,7 @@ import './style.css';
 
 export default function HelpFile() {
     return (
-        <div className="menu-help">
+        <div id="menu-help" className="app-menu">
             <Button icon={CircleQuestionMark} title="Open" iconOnly onClick={() => alert('Help')} />
         </div>
     );

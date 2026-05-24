@@ -8,7 +8,6 @@
     border-radius: var(--border-radius);
     background-color: var(--color-secondary-10);
     border: none;
-    cursor: pointer;
     transition: background-color 0.2s ease-in-out;
 }
 
@@ -17,6 +16,7 @@
     aspect-ratio: 1;
     height: 100%;
     border-radius: var(--border-radius);
+    cursor: pointer;
     transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 }
 
@@ -30,6 +30,7 @@
     width: 100%;
     height: 100%;
     padding: 0.25rem 0.5rem;
+    cursor: pointer;
 }
 
 .radio-switch-option.selected {
@@ -42,4 +43,5 @@
     opacity: 0;
     width: 100%;
     height: 100%;
+    cursor: pointer;
 }

@@ -1,6 +1,5 @@
 import MenuFile from '../MenuFile';
 import MenuView from '../MenuView';
-import MenuHelp from '../MenuHelp';
 import './style.css';
 
 export default function Header() {
@@ -12,7 +11,6 @@ export default function Header() {
             <div id="app-menu">
                 <MenuFile />
                 <MenuView />
-                <MenuHelp />
             </div>
         </header>
     );

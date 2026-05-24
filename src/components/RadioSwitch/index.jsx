@@ -5,7 +5,7 @@ export default function RadioSwitch({ options, ...props }) {
         <div className={`radio-switch ${props.className ?? ''}`}>
         {options.map(({ value: optValue, label, icon: Icon }) => (
             <div key={optValue} className={`radio-switch-option ${props.value === optValue ? 'selected' : ''}`}>
-                <label title={label} className='radio-switch-label'>
+                <label title={label} className='radio-switch-label' htmlFor={`${props.name}-${optValue}`}>
                     {
                         Icon && (
                         <Icon
@@ -15,8 +15,10 @@ export default function RadioSwitch({ options, ...props }) {
                     {props.iconOnly !== true && <span>{props.label}</span>}
                 </label>
                 <input
+                    id={`${props.name}-${optValue}`}
                     type="radio"
                     name={props.name}
+                    title={label}
                     value={optValue}
                     className='radio-switch-input'
                     checked={props.value === optValue}

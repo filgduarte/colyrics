@@ -3,3 +3,7 @@
     align-items: center;
     padding: 0.5rem var(--padding);
 }
+
+.radio-switch {
+    margin-left: var(--padding);
+}

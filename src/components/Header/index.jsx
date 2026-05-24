@@ -1,21 +1,17 @@
-import { useViewSettings } from './hooks/useViewSettings.js'
+import MenuFile from '../MenuFile';
+import MenuView from '../MenuView';
+import MenuHelp from '../MenuHelp';
+import './style.css';
 
 export default function Header() {
-    const { view, changeTheme, changeLayout } = useViewSettings();
-    // Exemplo de troca de tema/layout
-
     return (
         <header className="app-header">
-            <div className="logo"></div>
-            <div className="file-menu"></div>
-            <div className="view-menu">
-                <button onClick={() => changeLayout(view.layout === 'sideToSide' ? 'stacked' : 'sideToSide')}>
-                    Trocar layout
-                </button>
-                <button onClick={() => changeTheme(view.theme === 'light' ? 'dark' : 'light')}>
-                    Trocar tema
-                </button>
+            <div className="logo">
+                <img src="./logo.svg" alt="Colyrics" />
             </div>
+            <MenuFile />
+            <MenuView />
+            <MenuHelp />
         </header>
-    )
+    );
 }

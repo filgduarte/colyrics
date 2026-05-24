@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { ViewContext, ProjectContext } from './context.js'
 import { config } from './config.js'
-import { useViewSettings } from './hooks/useViewSettings.js'
-import { Header, Main } from './components'
+import { ViewContext, ProjectContext } from './context.js'
+import useViewSettings from './hooks/useViewSettings.js'
+import Header from './components/Header'
+import Main from './components/Main'
 import './App.css'
 
 
@@ -29,12 +30,12 @@ function App() {
 		],
 	});
 
-	const { view, loading } = useViewSettings();
+	const { view, loading, changeTheme, changeLayout } = useViewSettings();
 
 	if (loading) return <div className='loading'></div>;
 
 	return (
-		<ViewContext.Provider value={{ view, setView: () => {} }}>
+		<ViewContext.Provider value={{ view, changeTheme, changeLayout }}>
 			<ProjectContext.Provider value={{ project, setProject }}>
 				<div className={`app ${view.theme} ${view.layout}`}>
 					<Header />

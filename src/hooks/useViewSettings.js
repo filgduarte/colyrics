@@ -1,38 +1,38 @@
-import { useState, useEffect, useCallback, useContext } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getSettings, updateSettings } from '../models/settings';
-import { ViewContext } from '../context';
+import { config } from '../config';
 
 export default function useViewSettings() {
-    const { view, setView } = useContext(ViewContext);
+    const [view, setView] = useState({
+        theme: config.view.defaultTheme,
+        layout: config.view.defaultLayout,
+    });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        async function loadSettings() {
-            const settings = await getSettings();
-            if (settings && settings.view) {
+        getSettings().then((settings) => {
+            if (settings?.view) {
                 setView(settings.view);
             }
             setLoading(false);
-        }
-        loadSettings();
+        });
+    }, []);
 
-    }, [setView]);
-
-    const changeTheme = useCallback(async (theme) => {
+    const changeTheme = useCallback((theme) => {
         setView((prev) => {
             const updated = { ...prev, theme };
             updateSettings({ view: updated });
             return updated;
         });
-    }, [setView]);
+    }, []);
 
-    const changeLayout = useCallback(async (layout) => {
+    const changeLayout = useCallback((layout) => {
         setView((prev) => {
             const updated = { ...prev, layout };
             updateSettings({ view: updated });
             return updated;
         });
-    }, [setView]);
+    }, []);
 
     return { view, loading, changeTheme, changeLayout };
 }

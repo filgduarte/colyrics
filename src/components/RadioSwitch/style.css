@@ -1,4 +1,5 @@
 .radio-switch {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -8,16 +9,17 @@
     border-radius: var(--border-radius);
     background-color: var(--color-secondary-10);
     border: none;
-    transition: background-color 0.2s ease-in-out;
 }
 
 .radio-switch-option {
     position: relative;
+    z-index: 1;
     aspect-ratio: 1;
     height: 100%;
     border-radius: var(--border-radius);
     cursor: pointer;
-    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+    color: inherit;
+    transition: color 0.2s ease-in-out;
 }
 
 .radio-switch-label {
@@ -34,9 +36,20 @@
 }
 
 .radio-switch-option.selected {
-    background-color: var(--color-background);
     color: var(--color-primary);
+}
+
+.radio-switch-slider {
+    position: absolute;
+    top: 0.125rem;
+    left: 0.125rem;
+    height: calc(100% - 0.25rem);
+    aspect-ratio: 1;
+    border-radius: var(--border-radius);
+    background-color: var(--color-background);
     box-shadow: 1px 1px 0 0 var(--color-secondary-25);
+    transition: transform 0.2s ease-in-out;
+    z-index: 0;
 }
 
 .radio-switch input {

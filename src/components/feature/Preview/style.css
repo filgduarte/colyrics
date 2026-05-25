@@ -1,0 +1,122 @@
+.preview-container {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    height: 100%;
+    overflow: auto;
+    padding: 1rem;
+    background-color: var(--color-secondary-7);
+}
+
+.preview-page {
+    background: #ffffff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+    transform-origin: top center;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.preview-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--color-secondary-50);
+    font-size: var(--font-size);
+    user-select: none;
+}
+
+/* ── ChordMD Rendered Styles ── */
+
+.preview-rendered .chordmd {
+    line-height: 1.5;
+    color: #222;
+}
+
+.preview-rendered .chordmd header {
+    margin-bottom: 1.25em;
+}
+
+.preview-rendered .chordmd h1 {
+    font-size: 1.5em;
+    font-weight: 700;
+    margin: 0 0 0.25em 0;
+    color: #111;
+}
+
+.preview-rendered .chordmd ul.meta {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 0.85em;
+    color: #555;
+}
+
+.preview-rendered .chordmd ul.meta li {
+    display: inline;
+}
+
+.preview-rendered .chordmd ul.meta li:not(:last-child)::after {
+    content: ' · ';
+    color: #999;
+}
+
+.preview-rendered .chordmd .meta-key {
+    font-weight: 600;
+    margin-right: 0.25em;
+}
+
+.preview-rendered .chordmd main section {
+    margin-bottom: 1.25em;
+}
+
+.preview-rendered .chordmd section > h3 {
+    font-size: 0.95em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 0.5em 0;
+    color: #555;
+}
+
+.preview-rendered .chordmd blockquote {
+    margin: 0.5em 0;
+    padding-left: 0.75em;
+    border-left: 3px solid #ccc;
+}
+
+.preview-rendered .chordmd p.line {
+    margin: 0.15em 0;
+    line-height: inherit;
+}
+
+.preview-rendered .chordmd p.chord-only {
+    margin: 0.35em 0 0.1em 0;
+}
+
+.preview-rendered .chordmd .token {
+    display: inline;
+    white-space: pre-wrap;
+}
+
+.preview-rendered .chordmd .chord {
+    display: inline-block;
+    font-weight: 700;
+    color: #195edc;
+    font-size: 0.9em;
+    margin-right: 0.15em;
+}
+
+.preview-rendered .chordmd .text {
+    display: inline;
+}
+
+.preview-rendered .chordmd .spacer {
+    height: 0.5em;
+}
+
+.preview-rendered .chordmd .comment {
+    font-style: italic;
+    color: #888;
+    margin: 0.15em 0;
+}

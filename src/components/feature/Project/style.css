@@ -1,0 +1,80 @@
+.project-new-song-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    padding: 0.25rem;
+    cursor: pointer;
+    color: var(--color-secondary);
+    border-radius: var(--border-radius);
+    transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+}
+
+.project-new-song-btn:hover {
+    background-color: var(--color-secondary-10);
+    color: var(--color-primary);
+}
+
+.project-list {
+    margin: 0;
+    padding: 1rem 0.5rem;
+}
+
+.project-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.25rem var(--padding);
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+    border-radius: var(--border-radius);
+}
+
+.project-item:hover {
+    background-color: var(--color-secondary-7);
+}
+
+.project-item.active {
+    font-weight: 600;
+    color: var(--color-primary);
+    background-color: var(--color-secondary-7);
+}
+
+.project-item-index {
+    margin-right: 0.5rem;
+    color: var(--color-secondary);
+    font-size: var(--font-size-small);
+}
+
+.project-item-title {
+    flex: 1;
+    font-size: var(--font-size);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.project-item-delete {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    background: none;
+    border: none;
+    padding: 0.25rem;
+    cursor: pointer;
+    color: var(--color-secondary);
+    border-radius: var(--border-radius);
+    transition: opacity 0.15s ease-in-out, background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+    flex-shrink: 0;
+}
+
+.project-item:hover .project-item-delete {
+    opacity: 1;
+}
+
+.project-item-delete:hover {
+    background-color: var(--color-secondary-10);
+    color: #e74c3c;
+}

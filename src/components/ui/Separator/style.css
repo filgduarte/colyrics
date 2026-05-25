@@ -7,5 +7,5 @@
     display: block;
     width: 1px;
     height: 1rem;
-    background-color: var(--color-secondary-25);
+    background-color: var(--color-border);
 }

@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { config } from './config.js'
 import { ViewContext, ProjectContext } from './context.js'
 import useViewSettings from './hooks/useViewSettings.js'
-import Header from './components/Header'
-import Main from './components/Main'
+import Header from './components/layout/Header'
+import Main from './components/layout/Main'
 import './App.css'
 
 
@@ -30,14 +30,16 @@ function App() {
 		],
 	});
 
+	const [currentSongIndex, setCurrentSongIndex] = useState(0);
+
 	const { view, loading, changeTheme, changeLayout } = useViewSettings();
 
 	if (loading) return <div className='loading'></div>;
 
 	return (
 		<ViewContext.Provider value={{ view, changeTheme, changeLayout }}>
-			<ProjectContext.Provider value={{ project, setProject }}>
-				<div className={`app ${view.theme} ${view.layout}`}>
+			<ProjectContext.Provider value={{ project, setProject, currentSongIndex, setCurrentSongIndex }}>
+				<div id='app' className={`${view.theme} ${view.layout}`}>
 					<Header />
 					<Main />
 				</div>

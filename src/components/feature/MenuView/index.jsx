@@ -1,9 +1,9 @@
 import { useContext } from 'react';
 import { Brackets, CircleQuestionMark, Columns2, Eye, Moon, Sun } from 'lucide-react';
-import { ViewContext } from '../../context';
-import RadioSwitch from '../RadioSwitch';
-import Button from '../Button';
-import Separator from '../Separator';
+import { ViewContext } from '../../../context';
+import RadioSwitch from '../../ui/RadioSwitch';
+import Button from '../../ui/Button';
+import Separator from '../../ui/Separator';
 import './style.css';
 
 export default function MenuView() {

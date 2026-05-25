@@ -1,5 +1,5 @@
-import MenuFile from '../MenuFile';
-import MenuView from '../MenuView';
+import MenuFile from '../../feature/MenuFile';
+import MenuView from '../../feature/MenuView';
 import './style.css';
 
 export default function Header() {

@@ -26,6 +26,9 @@
   --color-accent-50: color-mix(in srgb, var(--color-accent) 50%, var(--color-background));
   --color-accent-25: color-mix(in srgb, var(--color-accent) 25%, var(--color-background));
 
+  --color-border: var(--color-secondary-25);
+  --color-border-light: var(--color-secondary-10);
+
   /* Typography */
   --font-primary: 'Inter', sans-serif;
   --font-mono: 'DM Mono', monospace;

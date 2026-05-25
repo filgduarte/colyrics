@@ -20,14 +20,14 @@ export default function MenuView() {
     return (
         <div id="menu-view" className="app-menu">
             <RadioSwitch
-                options={layoutOptions}
                 name="layout"
+                options={layoutOptions}
                 value={view.layout}
                 onChange={changeLayout}
             />
             <RadioSwitch
-                options={themeOptions}
                 name="theme"
+                options={themeOptions}
                 value={view.theme}
                 onChange={changeTheme}
             />

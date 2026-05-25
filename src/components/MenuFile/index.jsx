@@ -1,4 +1,4 @@
-import { FolderOpen, BookOpenText, Download, Settings } from 'lucide-react';
+import { BookOpenText, Download, File, FolderOpen, Settings } from 'lucide-react';
 import Button from '../Button';
 import Separator from '../Separator';
 import './style.css';
@@ -6,11 +6,12 @@ import './style.css';
 export default function MenuFile() {
     return (
         <div id="menu-file" className="app-menu">
-            <Button icon={FolderOpen} title="Open" onClick={() => alert('Open file')} />
-            <Button icon={Download} title="Save" onClick={() => alert('Save file')} />
-            <Button icon={BookOpenText} title="Export as PDF" onClick={() => alert('Export as PDF')} />
+            <Button title="New" icon={File} onClick={() => alert('New file')} />
+            <Button title="Open" icon={FolderOpen} onClick={() => alert('Open file')} />
+            <Button title="Save" icon={Download} tonClick={() => alert('Save file')} />
+            <Button title="Export as PDF" icon={BookOpenText} onClick={() => alert('Export as PDF')} />
             <Separator />
-            <Button icon={Settings} title="Settings" onClick={() => alert('Settings')} />
+            <Button title="Settings" icon={Settings} onClick={() => alert('Settings')} />
         </div>
     );
 }

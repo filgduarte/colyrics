@@ -14,6 +14,30 @@ import { escapeHTML } from "../renderer/utils.js";
  *   .syntax-error — empty brackets "[]", headers without space after #
  */
 
+/**
+ * Count syntax errors in full ChordMD content.
+ * Matches the same error conditions as highlightLine / highlightInline.
+ */
+export function countSyntaxErrors(content) {
+  const lines = content.split('\n');
+  let count = 0;
+
+  for (const line of lines) {
+    // Header without space after # (e.g. #Title, ##key)
+    if (/^#{1,3}[^#\s]/.test(line)) {
+      count++;
+      continue;
+    }
+
+    // Empty brackets [] anywhere in the line
+    if (/\[\s*\]/.test(line)) {
+      count++;
+    }
+  }
+
+  return count;
+}
+
 export function highlightLine(line) {
   // ── Comment ──
   if (/^\/\//.test(line)) {

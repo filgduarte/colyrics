@@ -2,7 +2,7 @@ import { useState, useContext, useRef, useCallback, useMemo } from 'react';
 import { Brackets } from 'lucide-react';
 import { ProjectContext } from '../../../context';
 import Panel from '../../ui/Panel';
-import { highlightLine } from '../../../lib/syntax-highlight';
+import { highlightLine, countSyntaxErrors } from '../../../lib/syntax-highlight';
 import './style.css';
 
 export default function Editor() {
@@ -14,23 +14,33 @@ export default function Editor() {
     const overlayRef = useRef(null);
     const lineNumbersRef = useRef(null);
 
-    const [activeLine, setActiveLine] = useState(0);
+    const [currentLine, setCurrentLine] = useState(0);
 
     const lineCount = useMemo(() => {
         return content.split('\n').length;
     }, [content]);
 
-    const updateActiveLine = useCallback(() => {
+    const stats = useMemo(() => {
+        const charCount = content.length;
+        const wordCount = content.trim().split(/\s+/).filter(w => w.length > 0).length;
+        return { lineCount, wordCount, charCount };
+    }, [content, lineCount]);
+
+    const syntaxErrorCount = useMemo(() => {
+        return countSyntaxErrors(content);
+    }, [content]);
+
+    const updateCurrentLine = useCallback(() => {
         const textarea = textareaRef.current;
         if (!textarea) return;
 
         const pos = textarea.selectionStart;
         const text = textarea.value;
-        let line = 0;
-        for (let i = 0; i < pos && i < text.length; i++) {
-            if (text[i] === '\n') line++;
-        }
-        setActiveLine(line);
+        // Use split on /\r?\n/ to handle both \n and \r\n
+        const lines = text.slice(0, pos).split(/\r?\n/);
+        const line = lines.length - 1;
+
+        setCurrentLine(line);
     }, []);
 
     const handleScroll = useCallback(() => {
@@ -50,8 +60,8 @@ export default function Editor() {
         }
 
         // Update active line on scroll/click as well
-        updateActiveLine();
-    }, [updateActiveLine]);
+        updateCurrentLine();
+    }, [updateCurrentLine]);
 
     const handleChange = useCallback((e) => {
         const newContent = e.target.value;
@@ -68,8 +78,8 @@ export default function Editor() {
         });
 
         // Update active line after content mutation
-        updateActiveLine();
-    }, [currentSongIndex, setProject, updateActiveLine]);
+        updateCurrentLine();
+    }, [currentSongIndex, setProject, updateCurrentLine]);
 
     const lineNumbers = useMemo(() => {
         const numbers = [];
@@ -84,12 +94,27 @@ export default function Editor() {
         return content.split('\n');
     }, [content]);
 
+    const syntaxErrorMsg = syntaxErrorCount === 0
+        ? 'No syntax errors detected'
+        : `${syntaxErrorCount} syntax error${syntaxErrorCount !== 1 ? 's' : ''} detected`;
+
+    const footer = (
+        <>
+            <span className="status-stats">
+                {`${stats.lineCount} lines • ${stats.wordCount} words • ${stats.charCount} characters`}
+            </span>
+            <span className={`status-syntax-errors${syntaxErrorCount > 0 ? ' has-errors' : ''}`}>
+                {syntaxErrorMsg}
+            </span>
+        </>
+    )
+
     return (
-        <Panel title="Editor" icon={Brackets}>
+        <Panel title="Editor" icon={Brackets} footer={footer}>
             <div className="editor-container">
                 <div className="editor-line-numbers" ref={lineNumbersRef}>
                     {lineNumbers.map(num => (
-                        <div key={num} className={`editor-line-number${num - 1 === activeLine ? ' active-line' : ''}`}>{num}</div>
+                        <div key={num} className={`editor-line-number${num - 1 === currentLine ? ' active-line' : ''}`}>{num}</div>
                     ))}
                 </div>
                 <div className="editor-content">
@@ -98,7 +123,7 @@ export default function Editor() {
                             {overlayLines.map((line, i) => (
                                 <div
                                     key={i}
-                                    className={`editor-overlay-line${i === activeLine ? ' active-line' : ''}`}
+                                    className={`editor-overlay-line${i === currentLine ? ' active-line' : ''}`}
                                 >
                                     <span dangerouslySetInnerHTML={{ __html: highlightLine(line) || '&nbsp;' }} />
                                 </div>
@@ -111,9 +136,9 @@ export default function Editor() {
                         value={content}
                         onChange={handleChange}
                         onScroll={handleScroll}
-                        onSelect={updateActiveLine}
-                        onKeyUp={updateActiveLine}
-                        onClick={updateActiveLine}
+                        onSelect={updateCurrentLine}
+                        onKeyUp={updateCurrentLine}
+                        onClick={updateCurrentLine}
                         spellCheck={false}
                         autoComplete="off"
                         autoCorrect="off"

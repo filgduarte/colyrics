@@ -34,8 +34,8 @@
   --color-syntax-section: #059669;
   --color-syntax-text: var(--color-foreground);
   --color-syntax-chord: var(--color-primary);
-  --color-syntax-blockquote: #D97706;
-  --color-syntax-comment: #6b7280;
+  --color-syntax-blockquote: var(--color-accent);
+  --color-syntax-comment: var(--color-secondary);
   --color-editor-current-line: color-mix(in srgb, var(--color-primary) 5%, transparent);
   --color-editor-line-number: var(--color-secondary-25);
   --color-editor-current-line-number: var(--color-secondary-50);

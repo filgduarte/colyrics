@@ -149,3 +149,12 @@
     border-radius: 2px;
 }
 
+/* ── Footer: Syntax Error Status ── */
+
+.status-syntax-errors {
+    color: var(--color-secondary);
+}
+
+.status-syntax-errors.has-errors {
+    color: var(--color-editor-error);
+}

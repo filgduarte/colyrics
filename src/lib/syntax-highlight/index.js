@@ -1,1 +1,1 @@
-export { highlightLine } from "./highlightLine.js";
+export { highlightLine, countSyntaxErrors } from "./highlightLine.js";

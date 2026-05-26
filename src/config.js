@@ -1,7 +1,7 @@
 export const config = {
     editor: {
-        defaultProjectTitle: 'untitled',
-        defaultSongTitle: 'untitled',
+        defaultProjectTitle: 'Untitled',
+        defaultSongTitle: 'Untitled',
     },
     preview: {
         size: 'A4',

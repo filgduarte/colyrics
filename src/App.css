@@ -29,6 +29,19 @@
   --color-border: var(--color-secondary-25);
   --color-border-light: var(--color-secondary-10);
 
+  --color-syntax-title: #ba437a;
+  --color-syntax-meta: #7C3AED;
+  --color-syntax-section: #059669;
+  --color-syntax-text: var(--color-foreground);
+  --color-syntax-chord: var(--color-primary);
+  --color-syntax-blockquote: #D97706;
+  --color-syntax-comment: #6b7280;
+  --color-editor-current-line: color-mix(in srgb, var(--color-primary) 5%, transparent);
+  --color-editor-line-number: var(--color-secondary-25);
+  --color-editor-current-line-number: var(--color-secondary-50);
+  --color-editor-error: #f44336;
+  --color-editor-error-background: #f4433615;
+
   /* Typography */
   --font-primary: 'Inter', sans-serif;
   --font-mono: 'DM Mono', monospace;

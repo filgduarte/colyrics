@@ -1,7 +1,8 @@
-import { useContext, useRef, useCallback, useMemo } from 'react';
+import { useState, useContext, useRef, useCallback, useMemo } from 'react';
 import { Brackets } from 'lucide-react';
 import { ProjectContext } from '../../../context';
 import Panel from '../../ui/Panel';
+import { highlightLine } from '../../../lib/syntax-highlight';
 import './style.css';
 
 export default function Editor() {
@@ -13,9 +14,24 @@ export default function Editor() {
     const overlayRef = useRef(null);
     const lineNumbersRef = useRef(null);
 
+    const [activeLine, setActiveLine] = useState(0);
+
     const lineCount = useMemo(() => {
         return content.split('\n').length;
     }, [content]);
+
+    const updateActiveLine = useCallback(() => {
+        const textarea = textareaRef.current;
+        if (!textarea) return;
+
+        const pos = textarea.selectionStart;
+        const text = textarea.value;
+        let line = 0;
+        for (let i = 0; i < pos && i < text.length; i++) {
+            if (text[i] === '\n') line++;
+        }
+        setActiveLine(line);
+    }, []);
 
     const handleScroll = useCallback(() => {
         const textarea = textareaRef.current;
@@ -32,19 +48,28 @@ export default function Editor() {
         if (lineNumbers) {
             lineNumbers.scrollTop = scrollTop;
         }
-    }, []);
+
+        // Update active line on scroll/click as well
+        updateActiveLine();
+    }, [updateActiveLine]);
 
     const handleChange = useCallback((e) => {
         const newContent = e.target.value;
+        const titleMatch = newContent.split('\n').find(line => line.startsWith('# '));
+        const newTitle = titleMatch ? titleMatch.slice(2).trim() : '';
+
         setProject(prev => {
             const newSongs = [...prev.songs];
             newSongs[currentSongIndex] = {
-                ...newSongs[currentSongIndex],
+                title: newTitle || newSongs[currentSongIndex].title,
                 content: newContent,
             };
             return { ...prev, songs: newSongs };
         });
-    }, [currentSongIndex, setProject]);
+
+        // Update active line after content mutation
+        updateActiveLine();
+    }, [currentSongIndex, setProject, updateActiveLine]);
 
     const lineNumbers = useMemo(() => {
         const numbers = [];
@@ -64,15 +89,18 @@ export default function Editor() {
             <div className="editor-container">
                 <div className="editor-line-numbers" ref={lineNumbersRef}>
                     {lineNumbers.map(num => (
-                        <div key={num} className="editor-line-number">{num}</div>
+                        <div key={num} className={`editor-line-number${num - 1 === activeLine ? ' active-line' : ''}`}>{num}</div>
                     ))}
                 </div>
                 <div className="editor-content">
                     <div className="editor-overlay" ref={overlayRef} aria-hidden="true">
                         <div className="editor-overlay-inner">
                             {overlayLines.map((line, i) => (
-                                <div key={i} className="editor-overlay-line">
-                                    {line || '\u00A0'}
+                                <div
+                                    key={i}
+                                    className={`editor-overlay-line${i === activeLine ? ' active-line' : ''}`}
+                                >
+                                    <span dangerouslySetInnerHTML={{ __html: highlightLine(line) || '&nbsp;' }} />
                                 </div>
                             ))}
                         </div>
@@ -83,6 +111,9 @@ export default function Editor() {
                         value={content}
                         onChange={handleChange}
                         onScroll={handleScroll}
+                        onSelect={updateActiveLine}
+                        onKeyUp={updateActiveLine}
+                        onClick={updateActiveLine}
                         spellCheck={false}
                         autoComplete="off"
                         autoCorrect="off"

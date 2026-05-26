@@ -14,18 +14,23 @@
     min-width: 2.5rem;
     padding: 0.75rem 0;
     overflow: hidden;
-    background-color: var(--color-secondary-7);
-    color: var(--color-secondary-50);
+    border-right: 1px solid var(--color-secondary-7);
+    color: var(--color-editor-line-number);
     font-family: var(--font-mono);
     font-size: var(--font-size);
+    font-weight: 500;
     line-height: 1.5;
     user-select: none;
 }
 
 .editor-line-number {
     padding: 0 0.5rem;
-    line-height: 1.5;
     min-height: 1.3125rem;
+    line-height: 1.5;
+}
+
+.editor-line-number.active-line {
+    color: var(--color-editor-current-line-number);
 }
 
 /* ── Editor Content (overlay + textarea) ── */
@@ -88,3 +93,59 @@
 .editor-textarea::selection {
     background: var(--color-primary-25);
 }
+
+/* ── Active Line Highlight ── */
+
+.editor-overlay-line.active-line {
+    background-color: var(--color-editor-current-line);
+    border-radius: 2px;
+}
+
+/* ── Syntax Highlight: Title ── */
+
+.editor-overlay-line .title {
+    color: var(--color-syntax-title);
+}
+
+/* ── Syntax Highlight: Meta ── */
+
+.editor-overlay-line .meta {
+    color: var(--color-syntax-meta);
+}
+
+/* ── Syntax Highlight: Section ── */
+
+.editor-overlay-line .section {
+    color: var(--color-syntax-section);
+}
+
+/* ── Syntax Highlight: Chord ── */
+
+.editor-overlay-line .chord {
+    color: var(--color-syntax-chord);
+}
+
+/* ── Syntax Highlight: Blockquote Marker ── */
+
+.editor-overlay-line .blockquote {
+    color: var(--color-syntax-blockquote);
+}
+
+/* ── Syntax Highlight: Comment ── */
+
+.editor-overlay-line .comment {
+    color: var(--color-syntax-comment);
+}
+
+/* ── Syntax Highlight: Error ── */
+
+.editor-overlay-line:has(.syntax-error) {
+    background-color: var(--color-editor-error-background);
+}
+
+.editor-overlay-line .syntax-error {
+    width: 100%;
+    color: var(--color-editor-error);
+    border-radius: 2px;
+}
+

@@ -34,7 +34,7 @@
 
   /* HEADER */
   header {
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
   }
 
   h1 {
@@ -56,23 +56,18 @@
 
   .meta li {
     display: flex;
-    background: #eee;
+    background: var(--color-preview-meta-background);
     padding: 0.125rem 0.375rem;
     border-radius: 0.25rem;
   }
 
   .meta-key {
     font-weight: 600;
-    color: #333;
   }
 
   .meta-key::after {
     content: ":";
     margin-right: 0.25rem;
-  }
-
-  .meta-value {
-    color: #555;
   }
 
   /* SECTIONS */
@@ -114,7 +109,7 @@
     font-size: 0.75rem;
     font-weight: 600;
     line-height: 1;
-    color: var(--viewer-accent-color);
+    color: var(--color-preview-accent);
   }
 
   .text:empty::after {
@@ -127,7 +122,7 @@
 
   /* COMMENTS */
   .comment {
-    color: var(--color-syntax-comment);
+    color: var(--color-secondary-75);
     font-style: italic;
     font-size: 0.9em;
   }
@@ -140,6 +135,6 @@
     
     padding-left: 0.75rem;
     margin: 0.375rem 0;
-    border-left: 0.125rem solid var(--viewer-accent-color);
+    border-left: 0.125rem solid var(--color-preview-accent);
   }
 }

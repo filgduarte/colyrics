@@ -83,7 +83,8 @@ export function highlightLine(line) {
   // ── Blockquote ──
   if (/^>/.test(line)) {
     const escaped = escapeHTML(line);
-    return `<span class="blockquote">&gt;</span>${escaped.slice(1)}`;
+    const lineWithoutMarker = highlightInline(escaped.slice(4));
+    return `<span class="blockquote">&gt;</span>${lineWithoutMarker}`;
   }
 
   // ── Lyric line with inline tokens ──

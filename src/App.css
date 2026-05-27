@@ -42,6 +42,9 @@
   --color-editor-error: #f44336;
   --color-editor-error-background: #f4433615;
 
+  --color-preview-meta-background: var(--color-secondary-7);
+  --color-preview-accent: var(--color-primary);
+
   /* Typography */
   --font-primary: 'Inter', sans-serif;
   --font-mono: 'DM Mono', monospace;

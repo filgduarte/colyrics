@@ -76,26 +76,20 @@ export default function Preview() {
     return (
         <Panel title="Preview" icon={Eye}>
             <div className="preview-container" ref={containerRef}>
-                {html ? (
+                <div
+                    className="preview-page"
+                    style={{
+                        transform: `scale(${scale})`,
+                        padding: margin,
+                        width: `${PREVIEW_BASE_WIDTH}px`,
+                    }}
+                >
                     <div
-                        className="preview-page"
-                        style={{
-                            transform: `scale(${scale})`,
-                            padding: margin,
-                            width: `${PREVIEW_BASE_WIDTH}px`,
-                        }}
-                    >
-                        <div
-                            className="preview-rendered"
-                            style={pageFontStyle}
-                            dangerouslySetInnerHTML={{ __html: html }}
-                        />
-                    </div>
-                ) : (
-                    <div className="preview-empty">
-                        Start typing to see the preview
-                    </div>
-                )}
+                        className="preview-rendered"
+                        style={pageFontStyle}
+                        dangerouslySetInnerHTML={{ __html: html }}
+                    />
+                </div>
             </div>
         </Panel>
     );

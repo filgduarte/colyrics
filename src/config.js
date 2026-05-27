@@ -4,8 +4,8 @@ export const config = {
         defaultSongTitle: 'Untitled',
     },
     preview: {
-        size: 'A4',
-        orientation: 'portrait',
+        width: '210mm',
+        height: '297mm',
         margin: '9.5%', // ~2cm on a A4 portrait page
         fontFamily: 'Arial',
         fontSize: 12,

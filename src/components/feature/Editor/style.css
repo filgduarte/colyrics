@@ -1,3 +1,7 @@
+.previewOnly #editor {
+  display: none;
+}
+
 .editor-container {
     display: flex;
     height: 100%;

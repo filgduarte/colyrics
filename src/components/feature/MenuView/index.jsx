@@ -9,9 +9,9 @@ import './style.css';
 export default function MenuView() {
     const { view, changeTheme, changeLayout } = useContext(ViewContext);
     const layoutOptions = [
-        { label: 'Editor only', value: 'editor', icon: Brackets, iconOnly: true },
+        { label: 'Editor only', value: 'editorOnly', icon: Brackets, iconOnly: true },
         { label: 'Side to side', value: 'sideToSide', icon: Columns2, iconOnly: true },
-        { label: 'Preview only', value: 'preview', icon: Eye, iconOnly: true },
+        { label: 'Preview only', value: 'previewOnly', icon: Eye, iconOnly: true },
     ];
     const themeOptions = [
         { label: 'Light theme', value: 'light', icon: Sun, iconOnly: true },

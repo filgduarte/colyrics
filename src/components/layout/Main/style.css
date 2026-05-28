@@ -1,5 +1,9 @@
 #app-main {
     display: grid;
-    grid-template-columns: var(--sidebar-width) 1fr 1fr;
+    grid-template-columns: var(--sidebar-width) 1fr;
     height: calc(100vh - var(--header-height));
+}
+
+.sideToSide #app-main {
+    grid-template-columns: var(--sidebar-width) 1fr 1fr;
 }

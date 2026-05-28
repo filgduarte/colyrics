@@ -77,8 +77,19 @@ export default function Preview() {
         setScale(newScale);
     }, [pageWidthPx]);
 
+    const footer = (
+        <>
+            <span className="status-settings">
+                {`Page size: ${width} × ${height} • Margins: ${margin}`}
+            </span>
+            <span className="status-pages">
+                {`Page ${currentSongIndex + 1} of ${project.songs.length}`}
+            </span>
+        </>
+    )
+
     return (
-        <Panel title="Preview" icon={Eye}>
+        <Panel title="Preview" icon={Eye} footer={footer}>
             <div
                 className="preview-container"
                 style={{ aspectRatio }}

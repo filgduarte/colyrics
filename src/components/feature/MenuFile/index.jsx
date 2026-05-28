@@ -45,7 +45,7 @@ export default function MenuFile() {
             <Button
                 title="Export as PDF"
                 icon={BookOpenText}
-                onClick={() => alert('Export as PDF')}
+                onClick={() => window.dispatchEvent(new CustomEvent('colyrics:export-pdf'))}
             />
             <Separator />
             <Button title="Settings" icon={Settings} onClick={() => alert('Settings')} />

@@ -3,33 +3,74 @@
 }
 
 #preview .panel-content {
-  padding: 2rem;
+  position: relative;
   background-color: var(--color-secondary-7);
+  overflow: hidden;
 }
 
+/* ── Wrapper: scrollable viewport ── */
+.preview-wrapper {
+  width: 100%;
+  height: 100%;
+  padding: 2rem;
+  overflow: auto;
+}
+
+/* ── Invisible measurement container ── */
+.preview-measure {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.preview-measure-inner {
+  box-sizing: border-box;
+}
+
+/* ── Page stack (groups multiple pages) ── */
+.preview-page-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 0;
+}
+
+/* ── One page: white background + shadow ── */
 .preview-container {
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    width: 100%;
-    background: #ffffff;
-    box-shadow: 0.25rem 0.25rem 1rem rgba(0, 0, 0, 0.15);
-    overflow: hidden;
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 100%;
+  background: #ffffff;
+  box-shadow: 0.25rem 0.25rem 1rem rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
 }
 
+/* ── Page content area (A4 dimensions + padding) ── */
 .preview-page {
-    transform-origin: top center;
-    flex-shrink: 0;
+  transform-origin: top center;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+/* ── Viewport clips content to one page ── */
+.preview-page-viewport {
+  overflow: hidden;
 }
 
 .preview-empty {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    color: var(--color-secondary-50);
-    font-size: var(--font-size);
-    user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--color-secondary-50);
+  font-size: var(--font-size);
+  user-select: none;
 }
 
 /* ── ChordMD Rendered Styles ── */
@@ -138,9 +179,102 @@
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
-    
+
     padding-left: 0.75rem;
     margin: 0.375rem 0;
     border-left: 0.125rem solid var(--color-preview-accent);
+  }
+}
+
+/* ── PDF Export (Print) ── */
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+  }
+
+  #app-header,
+  #app-main > *:not(#preview) {
+    display: none !important;
+  }
+
+  #preview {
+    position: static !important;
+    overflow: visible !important;
+    width: 100vw !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+
+  #preview .panel-header,
+  #preview .panel-footer {
+    display: none !important;
+  }
+
+  #preview .panel-content {
+    overflow: visible !important;
+    background: white !important;
+    padding: 0 !important;
+    max-height: none !important;
+  }
+
+  .preview-wrapper {
+    overflow: visible !important;
+    padding: 0 !important;
+  }
+
+  .preview-page-stack {
+    gap: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Each page-container = one physical page */
+  .preview-container {
+    box-shadow: none !important;
+    overflow: hidden !important;
+    page-break-after: always;
+    break-inside: avoid;
+    width: 100% !important;
+    max-width: 100% !important;
+    display: block !important;
+  }
+
+  .preview-container:last-child {
+    page-break-after: avoid;
+  }
+
+  /* Song-start: new song begins on fresh page (via previous page-break-after) */
+  .preview-container.song-start {
+    page-break-before: always;
+  }
+
+  /* Song-end: last page of a song — don't force break after (next song-start handles it) */
+  .preview-container.song-end {
+    page-break-after: avoid;
+  }
+
+  /* Remove scale transform only; keep translateY for viewport offset */
+  .preview-page {
+    transform: none !important;
+  }
+
+  /* Viewport keeps its clip — height from inline style */
+  .preview-page-viewport {
+    /* overflow: hidden kept from base */
+    /* height from inline style — do NOT override */
+  }
+
+  /* TranslateY preserved for page offset */
+  .preview-rendered {
+    /* transform: translateY(-Xpx) kept */
+  }
+
+  .preview-measure {
+    display: none !important;
   }
 }

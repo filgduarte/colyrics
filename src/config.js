@@ -6,7 +6,7 @@ export const config = {
     preview: {
         width: '210mm',
         height: '297mm',
-        margin: '9.5%', // ~2cm on a A4 portrait page
+        margin: '20mm',
         fontFamily: 'Arial',
         fontSize: 12,
         lineHeight: 1.5,

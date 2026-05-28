@@ -2,9 +2,9 @@ import './style.css';
 
 export default function Panel({icon: Icon, ...props}) {
     const id = props.title ? props.title.toLowerCase().replace(/\s+/g, '-') : undefined;
-    
+
     return(
-        <section id={id} className={`app-panel ${props.className}`}>
+        <section id={id} className={`app-panel ${props.className ?? ''}`}>
             <header className="panel-header">
                 <h2>
                     {

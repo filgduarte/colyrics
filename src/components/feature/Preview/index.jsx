@@ -7,8 +7,6 @@ import { renderHTML } from '../../../lib/renderer';
 import Panel from '../../ui/Panel';
 import './style.css';
 
-const PREVIEW_BASE_WIDTH = 600;
-
 export default function Preview() {
     const { project, currentSongIndex } = useContext(ProjectContext);
     const currentSong = project.songs[currentSongIndex];
@@ -39,8 +37,14 @@ export default function Preview() {
         };
     }, []);
 
-    // Margin from global config
-    const { margin } = config.preview;
+    // Width, Height and Margin from global config
+    const { width, height, margin } = config.preview;
+    // Converte mm para px (1mm ≈ 3.7795275591px)
+    const MM_TO_PX = 3.7795275591;
+    const pageWidthMM = parseInt(width);
+    const pageHeightMM = parseInt(height);
+    const pageWidthPx = pageWidthMM * MM_TO_PX;
+    const aspectRatio = pageWidthMM / pageHeightMM;
 
     // Listen to container width changes to recalculate scale
     useEffect(() => {
@@ -49,7 +53,7 @@ export default function Preview() {
             if (!el) return;
 
             const availableWidth = el.clientWidth;
-            const newScale = Math.min(availableWidth / PREVIEW_BASE_WIDTH, 1.5);
+            const newScale = availableWidth / pageWidthPx;
             setScale(newScale);
         };
 
@@ -61,7 +65,7 @@ export default function Preview() {
         }
 
         return () => observer.disconnect();
-    }, []);
+    }, [pageWidthPx]);
 
     // Recalculate scale when content changes (may change container layout)
     useEffect(() => {
@@ -69,19 +73,24 @@ export default function Preview() {
         if (!el) return;
 
         const availableWidth = el.clientWidth;
-        const newScale = Math.min(availableWidth / PREVIEW_BASE_WIDTH, 1.5);
+        const newScale = availableWidth / pageWidthPx;
         setScale(newScale);
-    }, [content]);
+    }, [pageWidthPx]);
 
     return (
         <Panel title="Preview" icon={Eye}>
-            <div className="preview-container" ref={containerRef}>
+            <div
+                className="preview-container"
+                style={{ aspectRatio }}
+                ref={containerRef}
+            >
                 <div
                     className="preview-page"
                     style={{
-                        transform: `scale(${scale})`,
+                        width: width,
+                        height: height,
                         padding: margin,
-                        width: `${PREVIEW_BASE_WIDTH}px`,
+                        transform: `scale(${scale})`,
                     }}
                 >
                     <div

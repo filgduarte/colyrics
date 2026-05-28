@@ -1,18 +1,21 @@
+
+#preview .panel-content {
+  padding: 2rem;
+  background-color: var(--color-secondary-7);
+}
+
 .preview-container {
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    height: 100%;
-    overflow: auto;
-    padding: 1rem;
-    background-color: var(--color-secondary-7);
+    width: 100%;
+    background: #ffffff;
+    box-shadow: 0.25rem 0.25rem 1rem rgba(0, 0, 0, 0.15);
+    overflow: hidden;
 }
 
 .preview-page {
-    background: #ffffff;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
     transform-origin: top center;
-    border-radius: 2px;
     flex-shrink: 0;
 }
 

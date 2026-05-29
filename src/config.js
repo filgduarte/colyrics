@@ -6,7 +6,10 @@ export const config = {
     preview: {
         width: '210mm',
         height: '297mm',
-        margin: '20mm',
+        marginTop: '20mm',
+        marginRight: '20mm',
+        marginBottom: '20mm',
+        marginLeft: '20mm',
         fontFamily: 'Arial',
         fontSize: 12,
         lineHeight: 1.5,

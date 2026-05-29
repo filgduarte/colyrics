@@ -8,21 +8,14 @@ import { calculatePageBreakpoints } from '../../../lib/paginator';
 import Panel from '../../ui/Panel';
 import './style.css';
 
-/* ── Page dimension constants (from config) ── */
+/* ── Constants ── */
 const MM_TO_PX = 3.7795275591;
-const { width, height, margin, pageGap } = config.preview;
-const pageWidthMM = parseInt(width);
-const pageHeightMM = parseInt(height);
-const pageWidthPx = pageWidthMM * MM_TO_PX;
-const pageContentHeightMM = pageHeightMM - 2 * parseInt(margin);
-const pageContentHeightPx = pageContentHeightMM * MM_TO_PX;
-const aspectRatio = pageWidthMM / pageHeightMM;
 
-const pageFontStyle = {
-    fontFamily: config.preview.fontFamily,
-    fontSize: `${config.preview.fontSize}pt`,
-    lineHeight: config.preview.lineHeight,
-};
+function parseMM(value) {
+    if (!value || typeof value !== 'string') return 20;
+    const match = value.match(/^([\d.]+)\s*mm/);
+    return match ? parseFloat(match[1]) : 20;
+}
 
 /* ── Helpers ── */
 function songToHTML(song) {
@@ -41,9 +34,22 @@ function makeSongData(song, index) {
     };
 }
 
+/* ── Dynamic page size style injection ── */
+function injectPageSizeStyle(width, height) {
+    const id = 'colyrics-page-size-style';
+    let el = document.getElementById(id);
+    if (!el) {
+        el = document.createElement('style');
+        el.id = id;
+        document.head.appendChild(el);
+    }
+    el.textContent = `@page { size: ${width} ${height}; margin: 0; }`;
+}
+
 /* ── Component ── */
 export default function Preview() {
     const { project, currentSongIndex, setCurrentSongIndex } = useContext(ProjectContext);
+    const settings = project?.settings;
     const wrapperRef = useRef(null);
     const measureRefs = useRef([]);
     const [scale, setScale] = useState(1);
@@ -56,6 +62,53 @@ export default function Preview() {
     const contentChangedRef = useRef(false);
     const resolvedSongsRef = useRef(null);
 
+    // ── Computed page dimensions from settings ──
+    const page = useMemo(() => {
+        const s = settings?.page || config.preview;
+        const widthMM = parseMM(s.width);
+        const heightMM = parseMM(s.height);
+        const marginTopMM = parseMM(s.marginTop);
+        const marginRightMM = parseMM(s.marginRight);
+        const marginBottomMM = parseMM(s.marginBottom);
+        const marginLeftMM = parseMM(s.marginLeft);
+
+        return {
+            width: s.width || '210mm',
+            height: s.height || '297mm',
+            widthMM,
+            heightMM,
+            widthPx: widthMM * MM_TO_PX,
+            marginTop: s.marginTop || '20mm',
+            marginRight: s.marginRight || '20mm',
+            marginBottom: s.marginBottom || '20mm',
+            marginLeft: s.marginLeft || '20mm',
+            marginTopMM,
+            marginRightMM,
+            marginBottomMM,
+            marginLeftMM,
+            contentHeightMM: heightMM - marginTopMM - marginBottomMM,
+            contentHeightPx: (heightMM - marginTopMM - marginBottomMM) * MM_TO_PX,
+            aspectRatio: widthMM / heightMM,
+            paddingStyle: `${s.marginTop || '20mm'} ${s.marginRight || '20mm'} ${s.marginBottom || '20mm'} ${s.marginLeft || '20mm'}`,
+        };
+    }, [settings?.page]);
+
+    const pageFontStyle = useMemo(() => {
+        const t = settings?.text || config.preview;
+        return {
+            fontFamily: t.fontFamily || 'Arial',
+            fontSize: `${t.fontSize || 12}pt`,
+            lineHeight: t.lineHeight || 1.5,
+        };
+    }, [settings?.text]);
+
+    const pageGap = config.preview.pageGap;
+
+    // Inject dynamic @page size for print
+    useEffect(() => {
+        injectPageSizeStyle(page.width, page.height);
+    }, [page.width, page.height]);
+
     // Always render all songs
     const songsData = useMemo(() => {
         return project.songs.map((s, i) => makeSongData(s, i));
@@ -66,13 +119,15 @@ export default function Preview() {
         const updateScale = () => {
             const el = wrapperRef.current;
             if (!el) return;
-            setScale(el.clientWidth / pageWidthPx);
+            const container = el.querySelector('.preview-page-stack');
+            if (!container) return;
+            setScale(container.clientWidth / page.widthPx);
         };
         updateScale();
         const observer = new ResizeObserver(updateScale);
         if (wrapperRef.current) observer.observe(wrapperRef.current);
         return () => observer.disconnect();
-    }, []);
+    }, [page.widthPx]);
 
     // Measure breakpoints after DOM commit
     useLayoutEffect(() => {
@@ -93,7 +148,7 @@ export default function Preview() {
                 if (!map.has(sd.songIndex)) { map.set(sd.songIndex, [0]); changed = true; }
                 return;
             }
-            const bp = calculatePageBreakpoints(chordmdEl, pageContentHeightPx);
+            const bp = calculatePageBreakpoints(chordmdEl, page.contentHeightPx);
             const existing = map.get(sd.songIndex);
             if (!existing || existing.length !== bp.length || existing.some((v, j) => v !== bp[j])) {
                 map.set(sd.songIndex, bp.length > 0 ? bp : [0]);
@@ -102,7 +157,7 @@ export default function Preview() {
         });
 
         if (changed) setMeasuredBreakpoints(map);
-    }, [songsData, measuredBreakpoints]);
+    }, [songsData, measuredBreakpoints, page.contentHeightPx]);
 
     // Resolve breakpoints
     const resolvedSongs = useMemo(() => {
@@ -119,7 +174,7 @@ export default function Preview() {
         return resolvedSongs.reduce((sum, sd) => sum + sd.breakpoints.length, 0);
     }, [resolvedSongs]);
 
-    // Block observer briefly after content changes (avoids resetting selection while editing)
+    // Block observer briefly after content changes
     useEffect(() => {
         contentChangedRef.current = true;
         const timer = setTimeout(() => { contentChangedRef.current = false; }, 400);
@@ -142,7 +197,6 @@ export default function Preview() {
             const songIndex = parseInt(bestEntry.target.dataset.songIndex);
             const pageIndex = parseInt(bestEntry.target.dataset.pageIndex);
             if (!isNaN(songIndex)) {
-                // Calculate global page number (use ref for latest data)
                 const songs = resolvedSongsRef.current;
                 let globalPage = 1;
                 for (const sd of songs) {
@@ -162,12 +216,11 @@ export default function Preview() {
         }
     }, [currentSongIndex, setCurrentSongIndex]);
 
-    // Re-attach observer when resolvedSongs change (DOM recreated)
+    // Re-attach observer when resolvedSongs change
     useEffect(() => {
         const wrapper = wrapperRef.current;
         if (!wrapper) return;
 
-        // Disconnect previous
         if (observerRef.current) observerRef.current.disconnect();
 
         const observer = new IntersectionObserver(handleIntersection, {
@@ -184,7 +237,6 @@ export default function Preview() {
 
     // ── Scroll to song when selected in Project ──
     useEffect(() => {
-        // Don't scroll if this change was triggered by the IntersectionObserver
         if (ignoreScrollRef.current) {
             ignoreScrollRef.current = false;
             return;
@@ -196,14 +248,12 @@ export default function Preview() {
         const target = wrapper.querySelector(`.preview-container[data-song-index="${currentSongIndex}"]`);
         if (!target) return;
 
-        // Check if target is already reasonably visible
         const wrapperRect = wrapper.getBoundingClientRect();
         const targetRect = target.getBoundingClientRect();
         const isVisible = targetRect.top >= wrapperRect.top && targetRect.bottom <= wrapperRect.bottom;
 
         if (!isVisible) {
             isScrollingRef.current = true;
-            // Calcular o gap em pixels
             let gapPx = 0;
             if (typeof pageGap === 'string' && pageGap.endsWith('rem')) {
                 const rem = parseFloat(pageGap);
@@ -214,7 +264,6 @@ export default function Preview() {
                 gapPx = pageGap;
             }
 
-            // Obter o padding-top real do wrapper
             const style = getComputedStyle(wrapper);
             let paddingTopPx = 0;
             if (style.paddingTop.endsWith('px')) {
@@ -225,8 +274,6 @@ export default function Preview() {
             }
 
             const marginPx = Math.min(gapPx, paddingTopPx);
-
-            // Posição do target relativa ao wrapper
             const wrapperTop = wrapper.getBoundingClientRect().top;
             const targetTop = target.getBoundingClientRect().top;
             const scrollOffset = targetTop - wrapperTop + wrapper.scrollTop - marginPx;
@@ -237,7 +284,7 @@ export default function Preview() {
             });
             setTimeout(() => { isScrollingRef.current = false; }, 600);
         }
-    }, [currentSongIndex]);
+    }, [currentSongIndex, pageGap]);
 
     // ── Export PDF flow ──
     useEffect(() => {
@@ -267,7 +314,7 @@ export default function Preview() {
     const footer = (
         <>
             <span className="status-settings">
-                {`Page size: ${width} × ${height} • Margins: ${margin}`}
+                {`Page: ${page.width} × ${page.height} • Margins: ${page.marginTop} ${page.marginRight} ${page.marginBottom} ${page.marginLeft}`}
             </span>
             <span className="status-pages">
                 {`Page ${currentGlobalPage} of ${totalPageCount}`}
@@ -299,8 +346,8 @@ export default function Preview() {
                         <div
                             className="preview-measure-inner"
                             style={{
-                                width,
-                                padding: margin,
+                                width: page.width,
+                                padding: page.paddingStyle,
                                 ...pageFontStyle,
                             }}
                             dangerouslySetInnerHTML={{ __html: sd.html }}
@@ -320,20 +367,20 @@ export default function Preview() {
                                 data-song-index={sd.songIndex}
                                 data-page-index={pageIdx}
                                 className={pageClass(songIdx, pageIdx)}
-                                style={{ aspectRatio }}
+                                style={{ aspectRatio: page.aspectRatio }}
                             >
                                 <div
                                     className="preview-page"
                                     style={{
-                                        width,
-                                        height,
-                                        padding: margin,
+                                        width: page.width,
+                                        height: page.height,
+                                        padding: page.paddingStyle,
                                         transform: isPrinting ? 'none' : `scale(${scale})`,
                                     }}
                                 >
                                     <div
                                         className="preview-page-viewport"
-                                        style={{ height: `${pageContentHeightMM}mm` }}
+                                        style={{ height: `${page.contentHeightMM}mm` }}
                                     >
                                         <div
                                             className="preview-rendered"

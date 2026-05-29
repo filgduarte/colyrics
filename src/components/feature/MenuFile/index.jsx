@@ -1,16 +1,18 @@
 import { Download, File, FolderOpen, Printer, Settings } from 'lucide-react';
-import { useContext, useCallback } from 'react';
+import { useContext, useCallback, useState } from 'react';
 import { ProjectContext } from '../../../context';
 import useFileImport from '../../../hooks/useFileImport';
 import { saveProject, saveSong } from '../../../lib/save';
 import SplitButton from '../../ui/SplitButton';
 import Button from '../../ui/Button';
 import Separator from '../../ui/Separator';
+import SettingsDialog from '../Settings';
 import './style.css';
 
 export default function MenuFile() {
     const { project, setProject, currentSongIndex } = useContext(ProjectContext);
     const { openFilePicker } = useFileImport(project, setProject);
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
     const handleSaveProject = useCallback(() => {
         saveProject(project);
@@ -48,7 +50,11 @@ export default function MenuFile() {
                 onClick={() => window.dispatchEvent(new CustomEvent('colyrics:print'))}
             />
             <Separator />
-            <Button title="Settings" icon={Settings} onClick={() => alert('Settings')} />
+            <Button title="Settings" icon={Settings} onClick={() => setIsSettingsOpen(true)} />
+            <SettingsDialog
+                isOpen={isSettingsOpen}
+                onClose={() => setIsSettingsOpen(false)}
+            />
         </div>
     );
 }

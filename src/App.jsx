@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { config } from './config.js'
 import { ViewContext, ProjectContext } from './context.js'
 import useViewSettings from './hooks/useViewSettings.js'
@@ -17,9 +17,12 @@ function App() {
 				lineHeight: config.preview.lineHeight,
 			},
 			page: {
-				size: config.preview.size,
-				orientation: config.preview.orientation,
-				margin: config.preview.margin,
+				width: config.preview.width,
+				height: config.preview.height,
+				marginTop: config.preview.marginTop,
+				marginRight: config.preview.marginRight,
+				marginBottom: config.preview.marginBottom,
+				marginLeft: config.preview.marginLeft,
 			}
 		},
 		songs: [
@@ -34,11 +37,18 @@ function App() {
 
 	const { view, loading, changeTheme, changeLayout } = useViewSettings();
 
+	const updateSettings = useCallback((newSettings) => {
+		setProject((prev) => ({
+			...prev,
+			settings: newSettings,
+		}));
+	}, []);
+
 	if (loading) return <div className='loading'></div>;
 
 	return (
 		<ViewContext.Provider value={{ view, changeTheme, changeLayout }}>
-			<ProjectContext.Provider value={{ project, setProject, currentSongIndex, setCurrentSongIndex }}>
+			<ProjectContext.Provider value={{ project, setProject, currentSongIndex, setCurrentSongIndex, updateSettings }}>
 				<div id='app' className={`${view.theme} ${view.layout}`}>
 					<Header />
 					<Main />

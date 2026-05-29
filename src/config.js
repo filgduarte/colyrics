@@ -10,7 +10,7 @@ export const config = {
         fontFamily: 'Arial',
         fontSize: 12,
         lineHeight: 1.5,
-        pageGap: '1.5rem',
+        pageGap: '4rem',
     },
     recentProjectsSize: 10,
     view: {

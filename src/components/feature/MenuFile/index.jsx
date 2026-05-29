@@ -1,4 +1,4 @@
-import { BookOpenText, Download, File, FolderOpen, Settings } from 'lucide-react';
+import { Download, File, FolderOpen, Printer, Settings } from 'lucide-react';
 import { useContext, useCallback } from 'react';
 import { ProjectContext } from '../../../context';
 import useFileImport from '../../../hooks/useFileImport';
@@ -43,9 +43,9 @@ export default function MenuFile() {
                 ]}
             />
             <Button
-                title="Export as PDF"
-                icon={BookOpenText}
-                onClick={() => window.dispatchEvent(new CustomEvent('colyrics:export-pdf'))}
+                title="Print"
+                icon={Printer}
+                onClick={() => window.dispatchEvent(new CustomEvent('colyrics:print'))}
             />
             <Separator />
             <Button title="Settings" icon={Settings} onClick={() => alert('Settings')} />

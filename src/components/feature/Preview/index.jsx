@@ -25,7 +25,6 @@ const pageFontStyle = {
 };
 
 /* ── Helpers ── */
-
 function songToHTML(song) {
     if (!song) return '';
     const content = song.content || '';
@@ -43,7 +42,6 @@ function makeSongData(song, index) {
 }
 
 /* ── Component ── */
-
 export default function Preview() {
     const { project, currentSongIndex, setCurrentSongIndex } = useContext(ProjectContext);
     const wrapperRef = useRef(null);
@@ -205,17 +203,47 @@ export default function Preview() {
 
         if (!isVisible) {
             isScrollingRef.current = true;
-            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Calcular o gap em pixels
+            let gapPx = 0;
+            if (typeof pageGap === 'string' && pageGap.endsWith('rem')) {
+                const rem = parseFloat(pageGap);
+                gapPx = rem * parseFloat(getComputedStyle(document.documentElement).fontSize);
+            } else if (typeof pageGap === 'string' && pageGap.endsWith('px')) {
+                gapPx = parseFloat(pageGap);
+            } else if (typeof pageGap === 'number') {
+                gapPx = pageGap;
+            }
+
+            // Obter o padding-top real do wrapper
+            const style = getComputedStyle(wrapper);
+            let paddingTopPx = 0;
+            if (style.paddingTop.endsWith('px')) {
+                paddingTopPx = parseFloat(style.paddingTop);
+            } else if (style.paddingTop.endsWith('rem')) {
+                const rem = parseFloat(style.paddingTop);
+                paddingTopPx = rem * parseFloat(getComputedStyle(document.documentElement).fontSize);
+            }
+
+            const marginPx = Math.min(gapPx, paddingTopPx);
+
+            // Posição do target relativa ao wrapper
+            const wrapperTop = wrapper.getBoundingClientRect().top;
+            const targetTop = target.getBoundingClientRect().top;
+            const scrollOffset = targetTop - wrapperTop + wrapper.scrollTop - marginPx;
+
+            wrapper.scrollTo({
+                top: scrollOffset,
+                behavior: 'smooth',
+            });
             setTimeout(() => { isScrollingRef.current = false; }, 600);
         }
     }, [currentSongIndex]);
 
     // ── Export PDF flow ──
-
     useEffect(() => {
         const handler = () => setIsPrinting(true);
-        window.addEventListener('colyrics:export-pdf', handler);
-        return () => window.removeEventListener('colyrics:export-pdf', handler);
+        window.addEventListener('colyrics:print', handler);
+        return () => window.removeEventListener('colyrics:print', handler);
     }, []);
 
     useEffect(() => {
@@ -236,7 +264,6 @@ export default function Preview() {
     }, []);
 
     // ── Render ──
-
     const footer = (
         <>
             <span className="status-settings">

@@ -36,7 +36,6 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 1rem 0;
 }
 
 /* ── One page: white background + shadow ── */
@@ -261,17 +260,6 @@
   /* Remove scale transform only; keep translateY for viewport offset */
   .preview-page {
     transform: none !important;
-  }
-
-  /* Viewport keeps its clip — height from inline style */
-  .preview-page-viewport {
-    /* overflow: hidden kept from base */
-    /* height from inline style — do NOT override */
-  }
-
-  /* TranslateY preserved for page offset */
-  .preview-rendered {
-    /* transform: translateY(-Xpx) kept */
   }
 
   .preview-measure {

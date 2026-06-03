@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { config } from './config.js'
+import { getDefaultProject } from './config.js'
 import { ViewContext, ProjectContext } from './context.js'
 import useViewSettings from './hooks/useViewSettings.js'
 import Header from './components/layout/Header'
@@ -8,30 +8,7 @@ import './App.css'
 
 
 function App() {
-	const [project, setProject] = useState({
-		title: config.editor.defaultProjectTitle,
-		settings: {
-			text: {
-				fontFamily: config.preview.fontFamily,
-				fontSize: config.preview.fontSize,
-				lineHeight: config.preview.lineHeight,
-			},
-			page: {
-				width: config.preview.width,
-				height: config.preview.height,
-				marginTop: config.preview.marginTop,
-				marginRight: config.preview.marginRight,
-				marginBottom: config.preview.marginBottom,
-				marginLeft: config.preview.marginLeft,
-			}
-		},
-		songs: [
-			{
-				title: config.editor.defaultSongTitle,
-				content: '',
-			}
-		],
-	});
+	const [project, setProject] = useState(getDefaultProject);
 
 	const [currentSongIndex, setCurrentSongIndex] = useState(0);
 

@@ -1,21 +1,16 @@
-import { useContext, useMemo, useRef, useEffect, useState, useLayoutEffect, useCallback } from 'react';
+import { useContext, useMemo, useRef, useEffect, useState, useCallback } from 'react';
 import { Eye } from 'lucide-react';
 import { ProjectContext } from '../../../context';
 import { config } from '../../../config';
 import { parseChordMD } from '../../../lib/parser';
 import { renderHTML } from '../../../lib/renderer';
-import { calculatePageBreakpoints } from '../../../lib/paginator';
 import Panel from '../../ui/Panel';
+import usePageDimensions from './usePageDimensions';
+import usePageFontStyle from './usePageFontStyle';
+import useResponsiveScale from './useResponsiveScale';
+import usePageBreakpoints from './usePageBreakpoints';
+import usePrintFlow from './usePrintFlow';
 import './style.css';
-
-/* ── Constants ── */
-const MM_TO_PX = 3.7795275591;
-
-function parseMM(value) {
-    if (!value || typeof value !== 'string') return 20;
-    const match = value.match(/^([\d.]+)\s*mm/);
-    return match ? parseFloat(match[1]) : 20;
-}
 
 /* ── Helpers ── */
 function songToHTML(song) {
@@ -51,57 +46,15 @@ export default function Preview() {
     const { project, currentSongIndex, setCurrentSongIndex } = useContext(ProjectContext);
     const settings = project?.settings;
     const wrapperRef = useRef(null);
-    const measureRefs = useRef([]);
-    const [scale, setScale] = useState(1);
-    const [isPrinting, setIsPrinting] = useState(false);
-    const [measuredBreakpoints, setMeasuredBreakpoints] = useState(() => new Map());
     const [currentGlobalPage, setCurrentGlobalPage] = useState(1);
     const isScrollingRef = useRef(false);
     const ignoreScrollRef = useRef(false);
     const observerRef = useRef(null);
     const contentChangedRef = useRef(false);
-    const resolvedSongsRef = useRef(null);
 
-    // ── Computed page dimensions from settings ──
-    const page = useMemo(() => {
-        const s = settings?.page || config.preview;
-        const widthMM = parseMM(s.width);
-        const heightMM = parseMM(s.height);
-        const marginTopMM = parseMM(s.marginTop);
-        const marginRightMM = parseMM(s.marginRight);
-        const marginBottomMM = parseMM(s.marginBottom);
-        const marginLeftMM = parseMM(s.marginLeft);
-
-        return {
-            width: s.width || '210mm',
-            height: s.height || '297mm',
-            widthMM,
-            heightMM,
-            widthPx: widthMM * MM_TO_PX,
-            marginTop: s.marginTop || '20mm',
-            marginRight: s.marginRight || '20mm',
-            marginBottom: s.marginBottom || '20mm',
-            marginLeft: s.marginLeft || '20mm',
-            marginTopMM,
-            marginRightMM,
-            marginBottomMM,
-            marginLeftMM,
-            contentHeightMM: heightMM - marginTopMM - marginBottomMM,
-            contentHeightPx: (heightMM - marginTopMM - marginBottomMM) * MM_TO_PX,
-            aspectRatio: widthMM / heightMM,
-            paddingStyle: `${s.marginTop || '20mm'} ${s.marginRight || '20mm'} ${s.marginBottom || '20mm'} ${s.marginLeft || '20mm'}`,
-        };
-    }, [settings?.page]);
-
-    const pageFontStyle = useMemo(() => {
-        const t = settings?.text || config.preview;
-        return {
-            fontFamily: t.fontFamily || 'Arial',
-            fontSize: `${t.fontSize || 12}pt`,
-            lineHeight: t.lineHeight || 1.5,
-        };
-    }, [settings?.text]);
-
+    // ── Hooks: computed values ──
+    const page = usePageDimensions(settings);
+    const pageFontStyle = usePageFontStyle(settings);
     const pageGap = config.preview.pageGap;
 
     // Inject dynamic @page size for print
@@ -114,65 +67,11 @@ export default function Preview() {
         return project.songs.map((s, i) => makeSongData(s, i));
     }, [project.songs]);
 
-    // Responsive scale
-    useEffect(() => {
-        const updateScale = () => {
-            const el = wrapperRef.current;
-            if (!el) return;
-            const container = el.querySelector('.preview-page-stack');
-            if (!container) return;
-            setScale(container.clientWidth / page.widthPx);
-        };
-        updateScale();
-        const observer = new ResizeObserver(updateScale);
-        if (wrapperRef.current) observer.observe(wrapperRef.current);
-        return () => observer.disconnect();
-    }, [page.widthPx]);
-
-    // Measure breakpoints after DOM commit
-    useLayoutEffect(() => {
-        const refs = measureRefs.current;
-        if (!refs || refs.length === 0) return;
-
-        const map = new Map(measuredBreakpoints);
-        let changed = false;
-
-        songsData.forEach((sd, i) => {
-            const el = refs[i];
-            if (!el || !sd.html) {
-                if (!map.has(sd.songIndex)) { map.set(sd.songIndex, [0]); changed = true; }
-                return;
-            }
-            const chordmdEl = el.querySelector('.chordmd');
-            if (!chordmdEl) {
-                if (!map.has(sd.songIndex)) { map.set(sd.songIndex, [0]); changed = true; }
-                return;
-            }
-            const bp = calculatePageBreakpoints(chordmdEl, page.contentHeightPx);
-            const existing = map.get(sd.songIndex);
-            if (!existing || existing.length !== bp.length || existing.some((v, j) => v !== bp[j])) {
-                map.set(sd.songIndex, bp.length > 0 ? bp : [0]);
-                changed = true;
-            }
-        });
-
-        if (changed) setMeasuredBreakpoints(map);
-    }, [songsData, measuredBreakpoints, page.contentHeightPx]);
-
-    // Resolve breakpoints
-    const resolvedSongs = useMemo(() => {
-        return songsData.map(sd => ({
-            ...sd,
-            breakpoints: measuredBreakpoints.get(sd.songIndex) || sd.breakpoints,
-        }));
-    }, [songsData, measuredBreakpoints]);
-
-    // Keep ref in sync
-    useEffect(() => { resolvedSongsRef.current = resolvedSongs; }, [resolvedSongs]);
-
-    const totalPageCount = useMemo(() => {
-        return resolvedSongs.reduce((sum, sd) => sum + sd.breakpoints.length, 0);
-    }, [resolvedSongs]);
+    // ── Hooks: DOM-dependent ──
+    const scale = useResponsiveScale(wrapperRef, page.widthPx);
+    const { measureRefs, resolvedSongs, totalPageCount, resolvedSongsRef } =
+        usePageBreakpoints(songsData, page.contentHeightPx);
+    const { isPrinting } = usePrintFlow();
 
     // Block observer briefly after content changes
     useEffect(() => {
@@ -214,7 +113,7 @@ export default function Preview() {
                 }
             }
         }
-    }, [currentSongIndex, setCurrentSongIndex]);
+    }, [currentSongIndex, setCurrentSongIndex, resolvedSongsRef]);
 
     // Re-attach observer when resolvedSongs change
     useEffect(() => {
@@ -285,30 +184,6 @@ export default function Preview() {
             setTimeout(() => { isScrollingRef.current = false; }, 600);
         }
     }, [currentSongIndex, pageGap]);
-
-    // ── Export PDF flow ──
-    useEffect(() => {
-        const handler = () => setIsPrinting(true);
-        window.addEventListener('colyrics:print', handler);
-        return () => window.removeEventListener('colyrics:print', handler);
-    }, []);
-
-    useEffect(() => {
-        if (!isPrinting) return;
-        let raf1, raf2;
-        raf1 = requestAnimationFrame(() => {
-            raf2 = requestAnimationFrame(() => {
-                window.print();
-            });
-        });
-        return () => { cancelAnimationFrame(raf1); cancelAnimationFrame(raf2); };
-    }, [isPrinting]);
-
-    useEffect(() => {
-        const handler = () => setIsPrinting(false);
-        window.addEventListener('afterprint', handler);
-        return () => window.removeEventListener('afterprint', handler);
-    }, []);
 
     // ── Render ──
     const footer = (

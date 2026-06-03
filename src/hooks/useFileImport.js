@@ -7,15 +7,17 @@ import { importColyrics, importChordMD } from '../lib/import';
  *
  * @param {object} project - Current project state
  * @param {Function} setProject - React state setter for project
+ * @param {Function} setCurrentSongIndex - React state setter for current song index
  * @returns {{ openFilePicker: Function }}
  *
  * Behavior:
- * - .colyrics → prompts confirmation, replaces entire project
- * - .chordmd / .md → adds as new song(s) without removing existing ones
+ * - .colyrics → prompts confirmation, replaces entire project, resets song index to 0
+ * - .chordmd / .md → adds as new song(s) without removing existing ones,
+ *   and selects the first newly imported song
  * - If a .colyrics is among selected files, it takes priority and other files
  *   are ignored (per spec)
  */
-export default function useFileImport(project, setProject) {
+export default function useFileImport(project, setProject, setCurrentSongIndex) {
   const openFilePicker = useCallback(() => {
     // Create a temporary file input element
     const input = document.createElement('input');
@@ -40,6 +42,7 @@ export default function useFileImport(project, setProject) {
           const text = await colyricsFile.text();
           const projectData = importColyrics(text);
           setProject(projectData);
+          setCurrentSongIndex(0);
           return;
         }
 
@@ -64,10 +67,12 @@ export default function useFileImport(project, setProject) {
         );
 
         // Append imported songs without overwriting existing ones
+        const firstNewIndex = project.songs.length;
         setProject((prev) => ({
           ...prev,
           songs: [...prev.songs, ...songs],
         }));
+        setCurrentSongIndex(firstNewIndex);
       } catch (error) {
         window.alert(`Error importing file: ${error.message}`);
         console.error('File import error:', error);
@@ -75,7 +80,7 @@ export default function useFileImport(project, setProject) {
     };
 
     input.click();
-  }, [setProject]);
+  }, [project.songs.length, setProject, setCurrentSongIndex]);
 
   return { openFilePicker };
 }

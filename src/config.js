@@ -20,4 +20,32 @@ export const config = {
         defaultTheme: 'light',
         defaultLayout: 'sideToSide',
     },
+};
+
+/** Returns a fresh default project state. */
+export function getDefaultProject() {
+    return {
+        title: config.editor.defaultProjectTitle,
+        settings: {
+            text: {
+                fontFamily: config.preview.fontFamily,
+                fontSize: config.preview.fontSize,
+                lineHeight: config.preview.lineHeight,
+            },
+            page: {
+                width: config.preview.width,
+                height: config.preview.height,
+                marginTop: config.preview.marginTop,
+                marginRight: config.preview.marginRight,
+                marginBottom: config.preview.marginBottom,
+                marginLeft: config.preview.marginLeft,
+            },
+        },
+        songs: [
+            {
+                title: config.editor.defaultSongTitle,
+                content: '',
+            },
+        ],
+    };
 }

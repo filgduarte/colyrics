@@ -1,6 +1,7 @@
 import { Download, File, FolderOpen, Printer, Settings } from 'lucide-react';
 import { useContext, useCallback, useState } from 'react';
 import { ProjectContext } from '../../../context';
+import { getDefaultProject } from '../../../config';
 import useFileImport from '../../../hooks/useFileImport';
 import { saveProject, saveSong } from '../../../lib/save';
 import SplitButton from '../../ui/SplitButton';
@@ -10,9 +11,18 @@ import SettingsDialog from '../Settings';
 import './style.css';
 
 export default function MenuFile() {
-    const { project, setProject, currentSongIndex } = useContext(ProjectContext);
-    const { openFilePicker } = useFileImport(project, setProject);
+    const { project, setProject, currentSongIndex, setCurrentSongIndex } = useContext(ProjectContext);
+    const { openFilePicker } = useFileImport(project, setProject, setCurrentSongIndex);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+    const handleNew = useCallback(() => {
+        const confirmed = window.confirm(
+            'Creating a new project will replace the current one. Continue?'
+        );
+        if (!confirmed) return;
+        setProject(getDefaultProject());
+        setCurrentSongIndex(0);
+    }, [setProject, setCurrentSongIndex]);
 
     const handleSaveProject = useCallback(() => {
         saveProject(project);
@@ -27,7 +37,7 @@ export default function MenuFile() {
 
     return (
         <div id="menu-file" className="app-menu">
-            <Button title="New" icon={File} onClick={() => alert('New file')} />
+            <Button title="New" icon={File} onClick={handleNew} />
             <Button title="Open" icon={FolderOpen} onClick={openFilePicker} />
             <SplitButton
                 title="Save"

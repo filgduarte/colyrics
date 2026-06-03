@@ -1,8 +1,9 @@
-import { useState, useContext, useRef, useCallback, useMemo } from 'react';
+import { useState, useContext, useRef, useCallback } from 'react';
 import { Brackets } from 'lucide-react';
 import { ProjectContext } from '../../../context';
 import Panel from '../../ui/Panel';
-import { highlightLine, countSyntaxErrors } from '../../../lib/syntax-highlight';
+import { highlightLine } from '../../../lib/syntax-highlight';
+import useEditorStats from './useEditorStats';
 import './style.css';
 
 export default function Editor() {
@@ -16,19 +17,8 @@ export default function Editor() {
 
     const [currentLine, setCurrentLine] = useState(0);
 
-    const lineCount = useMemo(() => {
-        return content.split('\n').length;
-    }, [content]);
-
-    const stats = useMemo(() => {
-        const charCount = content.length;
-        const wordCount = content.trim().split(/\s+/).filter(w => w.length > 0).length;
-        return { lineCount, wordCount, charCount };
-    }, [content, lineCount]);
-
-    const syntaxErrorCount = useMemo(() => {
-        return countSyntaxErrors(content);
-    }, [content]);
+    const { stats, syntaxErrorCount, syntaxErrorMsg, lineNumbers, overlayLines } =
+        useEditorStats(content);
 
     const updateCurrentLine = useCallback(() => {
         const textarea = textareaRef.current;
@@ -36,7 +26,6 @@ export default function Editor() {
 
         const pos = textarea.selectionStart;
         const text = textarea.value;
-        // Use split on /\r?\n/ to handle both \n and \r\n
         const lines = text.slice(0, pos).split(/\r?\n/);
         const line = lines.length - 1;
 
@@ -59,7 +48,6 @@ export default function Editor() {
             lineNumbers.scrollTop = scrollTop;
         }
 
-        // Update active line on scroll/click as well
         updateCurrentLine();
     }, [updateCurrentLine]);
 
@@ -70,6 +58,7 @@ export default function Editor() {
 
         setProject(prev => {
             const newSongs = [...prev.songs];
+            if (currentSongIndex < 0 || currentSongIndex >= newSongs.length) return prev;
             newSongs[currentSongIndex] = {
                 title: newTitle || newSongs[currentSongIndex].title,
                 content: newContent,
@@ -77,26 +66,8 @@ export default function Editor() {
             return { ...prev, songs: newSongs };
         });
 
-        // Update active line after content mutation
         updateCurrentLine();
     }, [currentSongIndex, setProject, updateCurrentLine]);
-
-    const lineNumbers = useMemo(() => {
-        const numbers = [];
-        const count = Math.max(lineCount, 1);
-        for (let i = 1; i <= count; i++) {
-            numbers.push(i);
-        }
-        return numbers;
-    }, [lineCount]);
-
-    const overlayLines = useMemo(() => {
-        return content.split('\n');
-    }, [content]);
-
-    const syntaxErrorMsg = syntaxErrorCount === 0
-        ? 'No syntax errors detected'
-        : `${syntaxErrorCount} syntax error${syntaxErrorCount !== 1 ? 's' : ''} detected`;
 
     const footer = (
         <>

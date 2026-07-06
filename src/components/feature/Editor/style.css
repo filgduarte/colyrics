@@ -91,12 +91,15 @@
     background: transparent;
     caret-color: var(--color-foreground);
     outline: none;
-    -webkit-text-fill-color: transparent;
 }
 
 .editor-textarea::selection {
     color: var(--color-background);
     background: var(--color-primary);
+}
+
+.editor-textarea::placeholder {
+    color: var(--color-secondary-50);
 }
 
 /* ── Active Line Highlight ── */

@@ -43,6 +43,7 @@ export function getDefaultProject() {
         },
         songs: [
             {
+                id: crypto.randomUUID(),
                 title: config.editor.defaultSongTitle,
                 content: '',
             },

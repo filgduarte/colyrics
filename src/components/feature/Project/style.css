@@ -26,9 +26,11 @@
     align-items: center;
     justify-content: space-between;
     padding: 0.25rem var(--padding);
+    padding-left: 0;
     cursor: pointer;
-    transition: background-color 0.15s ease-in-out;
+    transition: background-color 0.15s ease-in-out, opacity 0.15s ease-in-out;
     border-radius: var(--border-radius);
+    user-select: none;
 }
 
 .project-item:hover {
@@ -39,6 +41,58 @@
     font-weight: 600;
     color: var(--color-primary);
     background-color: var(--color-secondary-7);
+}
+
+/* Drag-and-drop styles */
+
+.project-item.dragging {
+    opacity: 0.4;
+}
+
+.project-item.drop-target {
+    position: relative;
+}
+
+.project-item.drop-target::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background-color: var(--color-primary);
+    border-radius: 2px;
+    z-index: 1;
+}
+
+.project-drop-indicator {
+    height: 3px;
+    margin: 1px 0;
+    background-color: var(--color-primary);
+    border-radius: 2px;
+    list-style: none;
+}
+
+/* Drag grip handle */
+
+.project-item-grip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.25rem;
+    color: var(--color-secondary);
+    cursor: grab;
+    flex-shrink: 0;
+    opacity: 0.2;
+    transition: opacity 0.15s ease-in-out;
+}
+
+.project-item:hover .project-item-grip {
+    opacity: 1;
+}
+
+.project-item-grip:active {
+    cursor: grabbing;
 }
 
 .project-item-index {

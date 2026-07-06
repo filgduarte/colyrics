@@ -111,6 +111,7 @@ export default function Editor() {
                         onKeyUp={updateCurrentLine}
                         onClick={updateCurrentLine}
                         spellCheck={false}
+                        placeholder={'Type your song here using ChordMD syntax. For example:\n# My Song Title\n## Artist Name\n\n### Verse 1\n[Am]This is a [G]song with [F]chords.\n\n### Chorus\n> [C]Chorus [G]goes [Am]here.'}
                         autoComplete="off"
                         autoCorrect="off"
                         autoCapitalize="off"

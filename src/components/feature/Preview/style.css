@@ -74,8 +74,10 @@
 
 /* ── ChordMD Rendered Styles ── */
 .chordmd {
-  font-family: var(--font-primary);
-  line-height: 1.4;
+  font-family: var(--font-preview, var(--font-primary));
+  font-size: var(--font-size-preview, var(--font-size));
+  color: var(--color-foreground-light);
+  line-height: var(--line-height-preview, 1.4);
   box-sizing: border-box;
 
   /* HEADER */
@@ -168,9 +170,10 @@
 
   /* COMMENTS */
   .comment {
-    color: var(--color-secondary-75);
+    color: var(--color-secondary-light);
     font-style: italic;
     font-size: 0.9em;
+    opacity: 0.75;
   }
 
   /* BLOCKQUOTE (highlight) */

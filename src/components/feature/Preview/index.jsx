@@ -62,6 +62,15 @@ export default function Preview() {
         injectPageSizeStyle(page.width, page.height);
     }, [page.width, page.height]);
 
+    useEffect(() => {
+        const wrapper = wrapperRef.current;
+        if (!wrapper) return;
+
+        wrapper.style.setProperty('--font-preview', pageFontStyle.fontFamily);
+        wrapper.style.setProperty('--font-size-preview', pageFontStyle.fontSize);
+        wrapper.style.setProperty('--line-height-preview', pageFontStyle.lineHeight);
+    }, [pageFontStyle.fontFamily, pageFontStyle.fontSize, pageFontStyle.lineHeight]);
+
     // Always render all songs
     const songsData = useMemo(() => {
         return project.songs.map((s, i) => makeSongData(s, i));
@@ -222,8 +231,7 @@ export default function Preview() {
                             className="preview-measure-inner"
                             style={{
                                 width: page.width,
-                                padding: page.paddingStyle,
-                                ...pageFontStyle,
+                                padding: page.paddingStyle
                             }}
                             dangerouslySetInnerHTML={{ __html: sd.html }}
                         />
@@ -260,7 +268,6 @@ export default function Preview() {
                                         <div
                                             className="preview-rendered"
                                             style={{
-                                                ...pageFontStyle,
                                                 transform: `translateY(-${offset}px)`,
                                             }}
                                             dangerouslySetInnerHTML={{ __html: sd.html }}

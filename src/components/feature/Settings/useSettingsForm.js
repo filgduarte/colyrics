@@ -29,7 +29,7 @@ export const PAGE_SIZE_OPTIONS = [
  *             handlePresetChange, handleTextChange, handlePageChange,
  *             handleCustomWidthNum, handleCustomWidthUnit,
  *             handleCustomHeightNum, handleCustomHeightUnit,
- *             handleMarginChange, handleSave, handleBackdropClick }}
+ *             handleMarginChange, handleSave }}
  */
 export default function useSettingsForm({ isOpen, settings, updateSettings, onClose }) {
     // Local form state
@@ -156,10 +156,6 @@ export default function useSettingsForm({ isOpen, settings, updateSettings, onCl
         onClose?.();
     }, [form, updateSettings, onClose]);
 
-    const handleBackdropClick = useCallback((e) => {
-        if (e.target === e.currentTarget) onClose?.();
-    }, [onClose]);
-
     // Derived
     const marginParsed = {
         top: parseUnit(form.page.marginTop),
@@ -186,6 +182,5 @@ export default function useSettingsForm({ isOpen, settings, updateSettings, onCl
         handleCustomHeightUnit,
         handleMarginChange,
         handleSave,
-        handleBackdropClick,
     };
 }

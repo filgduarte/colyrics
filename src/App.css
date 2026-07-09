@@ -6,22 +6,44 @@
 
 :root {
   /* Colors */
-  --color-background: #FFFFFF;
-  --color-foreground: #000000;
+  --color-background-light: #FFFFFF;
+  --color-foreground-light: #000000;
+  --color-primary-light: #195EDC;
+  --color-secondary-light: #55565C;
+  --color-accent-light: #55EE5D;
+  --color-syntax-title-light: #ba437a;
+  --color-syntax-meta-light: #7C3AED;
+  --color-syntax-section-light: #059669;
+  --color-editor-error-light: #f44336;
+  --color-editor-error-background-light: #f4433615;
+
+  --color-background-dark: #1a1b1e;
+  --color-foreground-dark: #e4e4e7;
+  --color-primary-dark: #6ba3f5;
+  --color-secondary-dark: #a1a1aa;
+  --color-accent-dark: #4ade80;
+  --color-syntax-title-dark: #e06c9f;
+  --color-syntax-meta-dark: #a78bfa;
+  --color-syntax-section-dark: #34d399;
+  --color-editor-error-dark: #ef5350;
+  --color-editor-error-background-dark: #ef535025;
+
+  --color-background: var(--color-background-light);
+  --color-foreground: var(--color-foreground-light);
   --color-foreground-75: color-mix(in srgb, var(--color-foreground) 75%, var(--color-background));
   --color-foreground-50: color-mix(in srgb, var(--color-foreground) 50%, var(--color-background));
   --color-foreground-25: color-mix(in srgb, var(--color-foreground) 25%, var(--color-background));
-  --color-primary: #195EDC;
+  --color-primary: var(--color-primary-light);
   --color-primary-75: color-mix(in srgb, var(--color-primary) 75%, var(--color-background));
   --color-primary-50: color-mix(in srgb, var(--color-primary) 50%, var(--color-background));
   --color-primary-25: color-mix(in srgb, var(--color-primary) 25%, var(--color-background));
-  --color-secondary: #55565C;
+  --color-secondary: var(--color-secondary-light);
   --color-secondary-75: color-mix(in srgb, var(--color-secondary) 75%, var(--color-background));
   --color-secondary-50: color-mix(in srgb, var(--color-secondary) 50%, var(--color-background));
   --color-secondary-25: color-mix(in srgb, var(--color-secondary) 25%, var(--color-background));
   --color-secondary-10: color-mix(in srgb, var(--color-secondary) 10%, var(--color-background));
   --color-secondary-7: color-mix(in srgb, var(--color-secondary) 7%, var(--color-background));
-  --color-accent: #55EE5D;
+  --color-accent: var(--color-accent-light);
   --color-accent-75: color-mix(in srgb, var(--color-accent) 75%, var(--color-background));
   --color-accent-50: color-mix(in srgb, var(--color-accent) 50%, var(--color-background));
   --color-accent-25: color-mix(in srgb, var(--color-accent) 25%, var(--color-background));
@@ -29,9 +51,9 @@
   --color-border: var(--color-secondary-25);
   --color-border-light: var(--color-secondary-10);
 
-  --color-syntax-title: #ba437a;
-  --color-syntax-meta: #7C3AED;
-  --color-syntax-section: #059669;
+  --color-syntax-title: var(--color-syntax-title-light);
+  --color-syntax-meta: var(--color-syntax-meta-light);
+  --color-syntax-section: var(--color-syntax-section-light);
   --color-syntax-text: var(--color-foreground);
   --color-syntax-chord: var(--color-primary);
   --color-syntax-blockquote: var(--color-accent);
@@ -39,11 +61,11 @@
   --color-editor-current-line: color-mix(in srgb, var(--color-primary) 5%, transparent);
   --color-editor-line-number: var(--color-secondary-25);
   --color-editor-current-line-number: var(--color-secondary-50);
-  --color-editor-error: #f44336;
-  --color-editor-error-background: #f4433615;
+  --color-editor-error: var(--color-editor-error-light);
+  --color-editor-error-background: var(--color-editor-error-background-light);
 
-  --color-preview-meta-background: var(--color-secondary-7);
-  --color-preview-accent: var(--color-primary);
+  --color-preview-meta-background: color-mix(in srgb, var(--color-secondary-light) 7%, var(--color-background-light));
+  --color-preview-accent: var(--color-primary-light);
 
   /* Typography */
   --font-primary: 'Inter', sans-serif;
@@ -60,12 +82,35 @@
   --sidebar-width: 15rem;
 }
 
+/* ── Dark theme ── */
+html.dark {
+  --color-background: var(--color-background-dark);
+  --color-foreground: var(--color-foreground-dark);
+  --color-primary: var(--color-primary-dark);
+  --color-secondary: var(--color-secondary-dark);
+  --color-accent: var(--color-accent-dark);
+  --color-syntax-title: var(--color-syntax-title-dark);
+  --color-syntax-meta: var(--color-syntax-meta-dark);
+  --color-syntax-section: var(--color-syntax-section-dark);
+  --color-editor-error: var(--color-editor-error-dark);
+  --color-editor-error-background: var(--color-editor-error-background-dark);
+}
+
 body {
   margin: 0;
   font-family: var(--font-primary);
   font-size: var(--font-size);
   background-color: var(--color-background);
   color: var(--color-foreground);
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
 }
 
 #app {

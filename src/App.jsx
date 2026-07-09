@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { getDefaultProject } from './config.js'
 import { ViewContext, ProjectContext } from './context.js'
 import useViewSettings from './hooks/useViewSettings.js'
@@ -13,6 +13,11 @@ function App() {
 	const [currentSongIndex, setCurrentSongIndex] = useState(0);
 
 	const { view, loading, changeTheme, changeLayout } = useViewSettings();
+
+	// Sync theme class to <html> so body and portals inherit dark variables
+	useEffect(() => {
+		document.documentElement.classList.toggle('dark', view.theme === 'dark');
+	}, [view.theme]);
 
 	const updateSettings = useCallback((newSettings) => {
 		setProject((prev) => ({

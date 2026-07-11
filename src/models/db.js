@@ -4,8 +4,7 @@ import { config } from '../config';
 export const db = new Dexie('colyricsDB');
 
 db.version(1).stores({
-    settings: 'id, theme, view',
-    recentProjects: '++id, name, settings, songs, timestamp',
+    settings: 'id',
 });
 
 // Populates default settings on first load

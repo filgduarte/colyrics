@@ -4,12 +4,13 @@ import { countSyntaxErrors } from '../../../lib/syntax-highlight';
 /**
  * Derives display statistics and line data from editor content.
  * @param {string} content - Raw editor text
- * @returns {{ lineCount, stats, syntaxErrorCount, syntaxErrorMsg, lineNumbers, overlayLines }}
+ * @returns {{ stats, syntaxErrorCount, syntaxErrorMsg, lineNumbers, overlayLines }}
  */
 export default function useEditorStats(content) {
-    const lineCount = useMemo(() => {
-        return content.split('\n').length;
-    }, [content]);
+    // Split once; share the lines array across all derived values
+    const lines = useMemo(() => content.split('\n'), [content]);
+
+    const lineCount = lines.length;
 
     const stats = useMemo(() => {
         const charCount = content.length;
@@ -25,18 +26,12 @@ export default function useEditorStats(content) {
         ? 'No syntax errors detected'
         : `${syntaxErrorCount} syntax error${syntaxErrorCount !== 1 ? 's' : ''} detected`;
 
-    const lineNumbers = useMemo(() => {
-        const numbers = [];
-        const count = Math.max(lineCount, 1);
-        for (let i = 1; i <= count; i++) {
-            numbers.push(i);
-        }
-        return numbers;
-    }, [lineCount]);
+    // lineNumbers: avoid building an array in useMemo; just return the count.
+    // The Editor component can use Array.from({ length }, (_, i) => i + 1) inline.
+    const lineNumbers = lineCount;
 
-    const overlayLines = useMemo(() => {
-        return content.split('\n');
-    }, [content]);
+    // overlayLines is just the split lines
+    const overlayLines = lines;
 
-    return { lineCount, stats, syntaxErrorCount, syntaxErrorMsg, lineNumbers, overlayLines };
+    return { stats, syntaxErrorCount, syntaxErrorMsg, lineNumbers, overlayLines };
 }

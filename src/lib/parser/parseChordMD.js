@@ -1,6 +1,15 @@
 import { isChordMDFile, preprocess } from "./utils.js";
 import { parseLyricLine } from "./parseLyricLine.js";
 import { parseMetaLine } from "./parseMetaLine.js";
+import {
+    isEmpty,
+    isComment,
+    isTitle,
+    isMeta,
+    isSectionHeading,
+    isBlockquote,
+    stripBlockquote,
+} from "./classifyLine.js";
 
 export function parseChordMD(input, options = {}) {
   const { fileExtension = ".md", force = false } = options;
@@ -28,62 +37,57 @@ export function parseChordMD(input, options = {}) {
     let line = rawLine;
 
     // Detect blockquote
-    let isBlockquote = false;
-    const trimmedStart = line.trimStart();
-
-    if (trimmedStart.startsWith(">")) {
-      isBlockquote = true;
-      line = trimmedStart.replace(/^>\s?/, "");
+    let isBlockquoteLine = isBlockquote(line);
+    if (isBlockquoteLine) {
+      line = stripBlockquote(line);
     }
 
-    const cleanLine = line.trim();
-
     // Empty line
-    if (cleanLine === "") {
+    if (isEmpty(line)) {
       if (currentSection) {
         currentSection.lines.push({
           type: "empty",
-          blockquote: isBlockquote
+          blockquote: isBlockquoteLine
         });
       }
       continue;
     }
 
     // Comment
-    if (cleanLine.startsWith("//")) {
+    if (isComment(line)) {
       if (currentSection) {
         currentSection.lines.push({
           type: "comment",
-          value: cleanLine.slice(2).trim(),
-          blockquote: isBlockquote
+          value: line.trim().slice(2).trim(),
+          blockquote: isBlockquoteLine
         });
       }
       continue;
     }
 
     // Title
-    if (cleanLine.startsWith("# ") && !cleanLine.startsWith("##")) {
-      ast.title = cleanLine.slice(2).trim();
+    if (isTitle(line)) {
+      ast.title = line.trim().slice(2).trim();
       continue;
     }
 
     // Meta
-    if (cleanLine.startsWith("## ")) {
-      ast.meta.push(parseMetaLine(cleanLine.slice(3).trim()));
+    if (isMeta(line)) {
+      ast.meta.push(parseMetaLine(line.trim().slice(3).trim()));
       continue;
     }
 
-    // Section
-    if (cleanLine.startsWith("### ")) {
+    // Section heading
+    if (isSectionHeading(line)) {
       currentSection = {
-        name: cleanLine.slice(4).trim(),
+        name: line.trim().slice(4).trim(),
         lines: []
       };
       ast.sections.push(currentSection);
       continue;
     }
 
-    // Lyric line
+    // Lyric line (default — create implicit section if needed)
     if (!currentSection) {
       currentSection = {
         name: "",
@@ -95,7 +99,7 @@ export function parseChordMD(input, options = {}) {
     currentSection.lines.push({
       type: "lyric",
       tokens: parseLyricLine(line),
-      blockquote: isBlockquote
+      blockquote: isBlockquoteLine
     });
   }
 

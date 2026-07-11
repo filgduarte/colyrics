@@ -7,12 +7,16 @@ import { config } from '../../../config';
  * @returns {{ fontFamily, fontSize, lineHeight }}
  */
 export default function usePageFontStyle(settings) {
-    return useMemo(() => {
-        const t = settings?.text || config.preview;
-        return {
-            fontFamily: t.fontFamily,
-            fontSize: `${t.fontSize}pt`,
-            lineHeight: t.lineHeight,
-        };
-    }, [settings?.text]);
+    const text = settings?.text || config.preview;
+
+    // Depend on primitive values so useMemo cache works across renders
+    const ff = text.fontFamily;
+    const fs = text.fontSize;
+    const lh = text.lineHeight;
+
+    return useMemo(() => ({
+        fontFamily: ff,
+        fontSize: `${fs}pt`,
+        lineHeight: lh,
+    }), [ff, fs, lh]);
 }

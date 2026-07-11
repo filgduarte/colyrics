@@ -30,10 +30,7 @@ export default function SettingsDialog({ isOpen, onClose }) {
         isCustom,
         handlePresetChange,
         handleTextChange,
-        handleCustomWidthNum,
-        handleCustomWidthUnit,
-        handleCustomHeightNum,
-        handleCustomHeightUnit,
+        handleCustomDimension,
         handleMarginChange,
         handleSave,
     } = useSettingsForm({ isOpen, settings, updateSettings, onClose });
@@ -81,9 +78,9 @@ export default function SettingsDialog({ isOpen, onClose }) {
                                         min="1"
                                         step="1"
                                         value={customWidth.num}
-                                        onChange={handleCustomWidthNum}
+                                        onChange={(e) => handleCustomDimension('width', 'num', parseFloat(e.target.value) || 0)}
                                     />
-                                    <select value={customWidth.unit} onChange={handleCustomWidthUnit}>
+                                    <select value={customWidth.unit} onChange={(e) => handleCustomDimension('width', 'unit', e.target.value)}>
                                         <option value="mm">mm</option>
                                         <option value="cm">cm</option>
                                         <option value="in">in</option>
@@ -99,9 +96,9 @@ export default function SettingsDialog({ isOpen, onClose }) {
                                         min="1"
                                         step="1"
                                         value={customHeight.num}
-                                        onChange={handleCustomHeightNum}
+                                        onChange={(e) => handleCustomDimension('height', 'num', parseFloat(e.target.value) || 0)}
                                     />
-                                    <select value={customHeight.unit} onChange={handleCustomHeightUnit}>
+                                    <select value={customHeight.unit} onChange={(e) => handleCustomDimension('height', 'unit', e.target.value)}>
                                         <option value="mm">mm</option>
                                         <option value="cm">cm</option>
                                         <option value="in">in</option>

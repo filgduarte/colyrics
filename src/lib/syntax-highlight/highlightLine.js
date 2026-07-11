@@ -1,12 +1,22 @@
 import { escapeHTML } from "../renderer/utils.js";
+import {
+    isEmpty,
+    isComment,
+    isTitle,
+    isMeta,
+    isSectionHeading,
+    isBracketedSection,
+    isBlockquote,
+    isMalformedHeader,
+} from "../parser/classifyLine.js";
 
 /**
  * Syntax highlight a single line of ChordMD content.
  * Returns an HTML string safe for `dangerouslySetInnerHTML`.
  *
- * Token classes (per spec):
+ * Token classes:
  *   .title        — line starting with "# "
- *   .meta         — line starting with "## " (parser convention) or "@"
+ *   .meta         — line starting with "## " or "@"
  *   .section      — line starting with "### " or a standalone [SectionName]
  *   .chord        — inline [Chord] token
  *   .blockquote   — ">" marker
@@ -16,20 +26,16 @@ import { escapeHTML } from "../renderer/utils.js";
 
 /**
  * Count syntax errors in full ChordMD content.
- * Matches the same error conditions as highlightLine / highlightInline.
  */
 export function countSyntaxErrors(content) {
   const lines = content.split('\n');
   let count = 0;
 
   for (const line of lines) {
-    // Header without space after # (e.g. #Title, ##key)
-    if (/^#{1,3}[^#\s]/.test(line)) {
+    if (isMalformedHeader(line)) {
       count++;
       continue;
     }
-
-    // Empty brackets [] anywhere in the line
     if (/\[\s*\]/.test(line)) {
       count++;
     }
@@ -39,23 +45,28 @@ export function countSyntaxErrors(content) {
 }
 
 export function highlightLine(line) {
+  // ── Malformed header (must be checked before valid patterns) ──
+  if (isMalformedHeader(line)) {
+    return `<span class="syntax-error">${escapeHTML(line)}</span>`;
+  }
+
   // ── Comment ──
-  if (/^\/\//.test(line)) {
+  if (isComment(line)) {
     return `<span class="comment">${escapeHTML(line)}</span>`;
   }
 
-  // ── Section (### notation, from parser) ──
-  if (/^###\s/.test(line)) {
+  // ── Section heading (### notation) ──
+  if (isSectionHeading(line)) {
     return `<span class="section">${escapeHTML(line)}</span>`;
   }
 
-  // ── Meta (## key:value notation, from parser) ──
-  if (/^##\s/.test(line)) {
+  // ── Meta (## notation) ──
+  if (isMeta(line)) {
     return `<span class="meta">${escapeHTML(line)}</span>`;
   }
 
-  // ── Title (#  notation) ──
-  if (/^#\s/.test(line)) {
+  // ── Title (# notation) ──
+  if (isTitle(line)) {
     return `<span class="title">${escapeHTML(line)}</span>`;
   }
 
@@ -64,24 +75,18 @@ export function highlightLine(line) {
     return `<span class="meta">${escapeHTML(line)}</span>`;
   }
 
-  // ── Header without space after # (syntax error) ──
-  // Matches #X, ##X, ###X where X is not # or whitespace
-  if (/^#{1,3}[^#\s]/.test(line)) {
-    return `<span class="syntax-error">${escapeHTML(line)}</span>`;
-  }
-
   // ── Empty line ──
-  if (line === "") {
+  if (isEmpty(line)) {
     return "";
   }
 
-  // ── Section (bracket notation [Verse], from spec) ──
-  if (/^\[[^\]]+\]$/.test(line.trim())) {
+  // ── Bracketed section [Verse] ──
+  if (isBracketedSection(line)) {
     return `<span class="section">${escapeHTML(line)}</span>`;
   }
 
   // ── Blockquote ──
-  if (/^>/.test(line)) {
+  if (isBlockquote(line)) {
     const escaped = escapeHTML(line);
     const lineWithoutMarker = highlightInline(escaped.slice(4));
     return `<span class="blockquote">&gt;</span>${lineWithoutMarker}`;
@@ -99,15 +104,13 @@ function highlightInline(line) {
   let match;
 
   while ((match = chordRe.exec(escaped)) !== null) {
-    // Text before chord
     if (match.index > lastIndex) {
       parts.push(escaped.slice(lastIndex, match.index));
     }
 
-    const content = match[1]; // already escaped
+    const content = match[1];
 
     if (content === "") {
-      // Empty brackets = syntax error
       parts.push(`<span class="syntax-error">[]</span>`);
     } else {
       parts.push(`<span class="chord">[${content}]</span>`);
@@ -116,7 +119,6 @@ function highlightInline(line) {
     lastIndex = match.index + match[0].length;
   }
 
-  // Remaining text after last chord
   if (lastIndex < escaped.length) {
     parts.push(escaped.slice(lastIndex));
   }

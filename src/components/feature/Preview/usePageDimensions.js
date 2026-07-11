@@ -17,25 +17,35 @@ function parseMM(value) {
  *             marginLeftMM, contentHeightMM, contentHeightPx, aspectRatio, paddingStyle }}
  */
 export default function usePageDimensions(settings) {
+    const page = settings?.page || config.preview;
+
+    // Depend on primitive values so useMemo cache works across renders
+    // when settings objects are recreated with identical values.
+    const w = page.width;
+    const h = page.height;
+    const mt = page.marginTop;
+    const mr = page.marginRight;
+    const mb = page.marginBottom;
+    const ml = page.marginLeft;
+
     return useMemo(() => {
-        const s = settings?.page || config.preview;
-        const widthMM = parseMM(s.width);
-        const heightMM = parseMM(s.height);
-        const marginTopMM = parseMM(s.marginTop);
-        const marginRightMM = parseMM(s.marginRight);
-        const marginBottomMM = parseMM(s.marginBottom);
-        const marginLeftMM = parseMM(s.marginLeft);
+        const widthMM = parseMM(w);
+        const heightMM = parseMM(h);
+        const marginTopMM = parseMM(mt);
+        const marginRightMM = parseMM(mr);
+        const marginBottomMM = parseMM(mb);
+        const marginLeftMM = parseMM(ml);
 
         return {
-            width: s.width || '210mm',
-            height: s.height || '297mm',
+            width: w || '210mm',
+            height: h || '297mm',
             widthMM,
             heightMM,
             widthPx: widthMM * MM_TO_PX,
-            marginTop: s.marginTop || '20mm',
-            marginRight: s.marginRight || '20mm',
-            marginBottom: s.marginBottom || '20mm',
-            marginLeft: s.marginLeft || '20mm',
+            marginTop: mt || '20mm',
+            marginRight: mr || '20mm',
+            marginBottom: mb || '20mm',
+            marginLeft: ml || '20mm',
             marginTopMM,
             marginRightMM,
             marginBottomMM,
@@ -43,7 +53,7 @@ export default function usePageDimensions(settings) {
             contentHeightMM: heightMM - marginTopMM - marginBottomMM,
             contentHeightPx: (heightMM - marginTopMM - marginBottomMM) * MM_TO_PX,
             aspectRatio: widthMM / heightMM,
-            paddingStyle: `${s.marginTop || '20mm'} ${s.marginRight || '20mm'} ${s.marginBottom || '20mm'} ${s.marginLeft || '20mm'}`,
+            paddingStyle: `${mt || '20mm'} ${mr || '20mm'} ${mb || '20mm'} ${ml || '20mm'}`,
         };
-    }, [settings?.page]);
+    }, [w, h, mt, mr, mb, ml]);
 }

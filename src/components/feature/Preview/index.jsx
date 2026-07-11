@@ -13,11 +13,36 @@ import usePrintFlow from './usePrintFlow';
 import './style.css';
 
 /* ── Helpers ── */
+
+/**
+ * Fast content fingerprint: length + first/last N chars.
+ * Avoids re-parsing when content hasn't changed.
+ */
+function contentFingerprint(content) {
+    const len = content.length;
+    if (len <= 80) return `${len}:${content}`;
+    return `${len}:${content.slice(0, 40)}:${content.slice(-40)}`;
+}
+
+/**
+ * Parse + render cache. Keyed by fingerprint so identical content
+ * across songs reuses the same HTML string.
+ * @type {Map<string, string>}
+ */
+const htmlCache = new Map();
+
 function songToHTML(song) {
     if (!song) return '';
     const content = song.content || '';
+    const fp = contentFingerprint(content);
+
+    let html = htmlCache.get(fp);
+    if (html !== undefined) return html;
+
     const ast = parseChordMD(content, { force: true });
-    return ast ? renderHTML(ast) : '';
+    html = ast ? renderHTML(ast) : '';
+    htmlCache.set(fp, html);
+    return html;
 }
 
 function makeSongData(song, index) {

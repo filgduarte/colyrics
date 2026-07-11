@@ -84,7 +84,7 @@ export default function Editor() {
         <Panel title="Editor" icon={Brackets} footer={footer}>
             <div className="editor-container">
                 <div className="editor-line-numbers" ref={lineNumbersRef}>
-                    {lineNumbers.map(num => (
+                    {Array.from({ length: Math.max(lineNumbers, 1) }, (_, i) => i + 1).map(num => (
                         <div key={num} className={`editor-line-number${num - 1 === currentLine ? ' active-line' : ''}`}>{num}</div>
                     ))}
                 </div>

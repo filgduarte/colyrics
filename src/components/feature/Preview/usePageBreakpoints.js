@@ -1,58 +1,72 @@
-import { useState, useLayoutEffect, useMemo, useEffect, useRef } from 'react';
+import { useState, useLayoutEffect, useMemo, useRef } from 'react';
 import { calculatePageBreakpoints } from '../../../lib/paginator';
 
 /**
  * Measures DOM elements and computes pagination breakpoints for every song.
+ *
+ * Uses a ref-backed cache for breakpoints so that measurement itself does not
+ * cause re-renders. State is only updated when breakpoints actually change.
+ *
  * @param {Array} songsData - array of { songIndex, title, html, breakpoints }
  * @param {number} contentHeightPx - usable page height in pixels
- * @returns {{ measuredBreakpoints, resolvedSongs, totalPageCount, resolvedSongsRef }}
+ * @returns {{ measureRefs, resolvedSongs, totalPageCount, resolvedSongsRef }}
  */
 export default function usePageBreakpoints(songsData, contentHeightPx) {
     const measureRefs = useRef([]);
-    const [measuredBreakpoints, setMeasuredBreakpoints] = useState(() => new Map());
+    const breakpointCache = useRef(new Map());
+    const [version, setVersion] = useState(0);
 
     useLayoutEffect(() => {
         const refs = measureRefs.current;
         if (!refs || refs.length === 0) return;
 
-        const map = new Map(measuredBreakpoints);
+        const cache = breakpointCache.current;
         let changed = false;
 
         songsData.forEach((sd, i) => {
             const el = refs[i];
             if (!el || !sd.html) {
-                if (!map.has(sd.songIndex)) { map.set(sd.songIndex, [0]); changed = true; }
+                if (!cache.has(sd.songIndex)) {
+                    cache.set(sd.songIndex, [0]);
+                    changed = true;
+                }
                 return;
             }
             const chordmdEl = el.querySelector('.chordmd');
             if (!chordmdEl) {
-                if (!map.has(sd.songIndex)) { map.set(sd.songIndex, [0]); changed = true; }
+                if (!cache.has(sd.songIndex)) {
+                    cache.set(sd.songIndex, [0]);
+                    changed = true;
+                }
                 return;
             }
             const bp = calculatePageBreakpoints(chordmdEl, contentHeightPx);
-            const existing = map.get(sd.songIndex);
-            if (!existing || existing.length !== bp.length || existing.some((v, j) => v !== bp[j])) {
-                map.set(sd.songIndex, bp.length > 0 ? bp : [0]);
+            const normalized = bp.length > 0 ? bp : [0];
+            const existing = cache.get(sd.songIndex);
+
+            if (!existing || existing.length !== normalized.length ||
+                existing.some((v, j) => v !== normalized[j])) {
+                cache.set(sd.songIndex, normalized);
                 changed = true;
             }
         });
 
-        if (changed) setMeasuredBreakpoints(map);
-    }, [songsData, measuredBreakpoints, contentHeightPx]);
+        if (changed) setVersion(n => n + 1);
+    }, [songsData, contentHeightPx]);
 
     const resolvedSongs = useMemo(() => {
         return songsData.map(sd => ({
             ...sd,
-            breakpoints: measuredBreakpoints.get(sd.songIndex) || sd.breakpoints,
+            breakpoints: breakpointCache.current.get(sd.songIndex) || sd.breakpoints,
         }));
-    }, [songsData, measuredBreakpoints]);
+    }, [songsData, version]);
 
-    const resolvedSongsRef = useRef(null);
-    useEffect(() => { resolvedSongsRef.current = resolvedSongs; }, [resolvedSongs]);
+    const resolvedSongsRef = useRef(resolvedSongs);
+    resolvedSongsRef.current = resolvedSongs;
 
     const totalPageCount = useMemo(() => {
         return resolvedSongs.reduce((sum, sd) => sum + sd.breakpoints.length, 0);
     }, [resolvedSongs]);
 
-    return { measureRefs, measuredBreakpoints, resolvedSongs, totalPageCount, resolvedSongsRef };
+    return { measureRefs, resolvedSongs, totalPageCount, resolvedSongsRef };
 }

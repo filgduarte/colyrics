@@ -23,13 +23,6 @@ export const PAGE_SIZE_OPTIONS = [
 /**
  * Manages the settings dialog form state, syncs from project settings
  * when opened, and exposes all form mutation handlers.
- *
- * @param {{ isOpen: boolean, settings: object, updateSettings: Function, onClose: Function }} deps
- * @returns {{ form, preset, customWidth, customHeight, marginParsed, isCustom,
- *             handlePresetChange, handleTextChange, handlePageChange,
- *             handleCustomWidthNum, handleCustomWidthUnit,
- *             handleCustomHeightNum, handleCustomHeightUnit,
- *             handleMarginChange, handleSave }}
  */
 export default function useSettingsForm({ isOpen, settings, updateSettings, onClose }) {
     // Local form state
@@ -67,6 +60,7 @@ export default function useSettingsForm({ isOpen, settings, updateSettings, onCl
     }, [isOpen, settings]);
 
     // ── Handlers ──
+
     const handlePresetChange = useCallback((e) => {
         const label = e.target.value;
         setPreset(label);
@@ -88,68 +82,30 @@ export default function useSettingsForm({ isOpen, settings, updateSettings, onCl
         }));
     }, []);
 
-    const handlePageChange = useCallback((field, value) => {
-        setForm(prev => ({
-            ...prev,
-            page: { ...prev.page, [field]: value },
-        }));
-    }, []);
+    // Generic handler for custom dimension (width/height) num/unit changes
+    const handleCustomDimension = useCallback((dimension, field, value) => {
+        const setter = dimension === 'width' ? setCustomWidth : setCustomHeight;
+        const pageField = dimension;
 
-    const handleCustomWidthNum = useCallback((e) => {
-        const num = parseFloat(e.target.value) || 0;
-        setCustomWidth(prev => {
-            const next = { ...prev, num };
+        setter(prev => {
+            const next = { ...prev, [field]: value };
             setForm(p => ({
                 ...p,
-                page: { ...p.page, width: formatUnit(num, prev.unit) },
+                page: { ...p.page, [pageField]: formatUnit(next.num, next.unit) },
             }));
             return next;
         });
         setPreset('Custom');
-    }, []);
-
-    const handleCustomWidthUnit = useCallback((e) => {
-        const unit = e.target.value;
-        setCustomWidth(prev => {
-            const next = { ...prev, unit };
-            setForm(p => ({
-                ...p,
-                page: { ...p.page, width: formatUnit(prev.num, unit) },
-            }));
-            return next;
-        });
-    }, []);
-
-    const handleCustomHeightNum = useCallback((e) => {
-        const num = parseFloat(e.target.value) || 0;
-        setCustomHeight(prev => {
-            const next = { ...prev, num };
-            setForm(p => ({
-                ...p,
-                page: { ...p.page, height: formatUnit(num, prev.unit) },
-            }));
-            return next;
-        });
-        setPreset('Custom');
-    }, []);
-
-    const handleCustomHeightUnit = useCallback((e) => {
-        const unit = e.target.value;
-        setCustomHeight(prev => {
-            const next = { ...prev, unit };
-            setForm(p => ({
-                ...p,
-                page: { ...p.page, height: formatUnit(prev.num, unit) },
-            }));
-            return next;
-        });
     }, []);
 
     const handleMarginChange = useCallback((field, e) => {
         const num = parseFloat(e.target.value) || 0;
         const parsed = parseUnit(form.page[field]);
-        handlePageChange(field, formatUnit(num, parsed.unit));
-    }, [form.page, handlePageChange]);
+        setForm(prev => ({
+            ...prev,
+            page: { ...prev.page, [field]: formatUnit(num, parsed.unit) },
+        }));
+    }, [form.page]);
 
     const handleSave = useCallback(() => {
         updateSettings?.(form);
@@ -175,11 +131,7 @@ export default function useSettingsForm({ isOpen, settings, updateSettings, onCl
         isCustom,
         handlePresetChange,
         handleTextChange,
-        handlePageChange,
-        handleCustomWidthNum,
-        handleCustomWidthUnit,
-        handleCustomHeightNum,
-        handleCustomHeightUnit,
+        handleCustomDimension,
         handleMarginChange,
         handleSave,
     };

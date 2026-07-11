@@ -2,8 +2,9 @@
  * Paginator — Calcula breakpoints de página a partir da medição
  * real de elementos no DOM.
  *
- * Princípio: elementos atômicos (header, section, blockquote,
- * .line, .comment, .spacer, h1, h3) nunca são partidos ao meio.
+ * Princípio: elementos atômicos (blockquote, .line, .comment,
+ * .spacer, h1, h3) nunca são partidos ao meio. Containers como
+ * header e section são excluídos para evitar breakpoints prematuros.
  * Quando um elemento ultrapassa o limite da página atual, uma
  * nova página começa no topo desse elemento.
  *
@@ -19,10 +20,13 @@ export function calculatePageBreakpoints(chordmdEl, pageHeight) {
   const breakpoints = [0];
   if (!chordmdEl || pageHeight <= 0) return breakpoints;
 
-  // Elementos que não podem ser partidos
+  // Elementos atômicos que não podem ser partidos ao meio.
+  // Containers (header, section) são excluídos propositalmente —
+  // se fossem incluídos, um container que envolve todo o conteúdo
+  // acionaria um breakpoint prematuro no seu topo, impedindo que
+  // os filhos fossem paginados corretamente.
   const unbreakableSelector = [
-    'header', 'section', 'blockquote',
-    'h1', 'h3', '.line', '.comment', '.spacer'
+    'blockquote', 'h1', 'h3', '.line', '.comment', '.spacer'
   ].join(',');
 
   const elements = chordmdEl.querySelectorAll(unbreakableSelector);

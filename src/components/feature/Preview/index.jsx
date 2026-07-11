@@ -1,4 +1,4 @@
-import { useContext, useMemo, useRef, useEffect, useState, useCallback } from 'react';
+import { useContext, useMemo, useRef, useEffect, useLayoutEffect, useState, useCallback } from 'react';
 import { Eye } from 'lucide-react';
 import { ProjectContext } from '../../../context';
 import { config } from '../../../config';
@@ -15,13 +15,19 @@ import './style.css';
 /* ── Helpers ── */
 
 /**
- * Fast content fingerprint: length + first/last N chars.
+ * Fast content fingerprint: length + djb2 hash.
  * Avoids re-parsing when content hasn't changed.
+ * Sampling only the ends is fragile — a mid-text edit can keep
+ * length and both ends identical. A cheap hash catches those.
  */
 function contentFingerprint(content) {
     const len = content.length;
-    if (len <= 80) return `${len}:${content}`;
-    return `${len}:${content.slice(0, 40)}:${content.slice(-40)}`;
+    // Quick djb2 hash — fast enough for editor-sized strings
+    let hash = 5381;
+    for (let i = 0; i < len; i++) {
+        hash = ((hash << 5) + hash + content.charCodeAt(i)) | 0;
+    }
+    return `${len}:${hash}`;
 }
 
 /**
@@ -87,7 +93,10 @@ export default function Preview() {
         injectPageSizeStyle(page.width, page.height);
     }, [page.width, page.height]);
 
-    useEffect(() => {
+    // useLayoutEffect so font CSS vars are applied BEFORE
+    // usePageBreakpoints measures DOM elements (also in a layout effect).
+    // If we used useEffect the measurement would see stale font values.
+    useLayoutEffect(() => {
         const wrapper = wrapperRef.current;
         if (!wrapper) return;
 
@@ -104,7 +113,8 @@ export default function Preview() {
     // ── Hooks: DOM-dependent ──
     const scale = useResponsiveScale(wrapperRef, page.widthPx);
     const { measureRefs, resolvedSongs, totalPageCount, resolvedSongsRef } =
-        usePageBreakpoints(songsData, page.contentHeightPx);
+        usePageBreakpoints(songsData, page.contentHeightPx,
+            pageFontStyle.fontFamily, pageFontStyle.fontSize, pageFontStyle.lineHeight);
     const { isPrinting } = usePrintFlow();
 
     // Block observer briefly after content changes

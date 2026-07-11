@@ -9,9 +9,12 @@ import { calculatePageBreakpoints } from '../../../lib/paginator';
  *
  * @param {Array} songsData - array of { songIndex, title, html, breakpoints }
  * @param {number} contentHeightPx - usable page height in pixels
+ * @param {string} fontFamily - font family used in preview
+ * @param {string} fontSize - font size used in preview (e.g. "12pt")
+ * @param {number} lineHeight - line height multiplier
  * @returns {{ measureRefs, resolvedSongs, totalPageCount, resolvedSongsRef }}
  */
-export default function usePageBreakpoints(songsData, contentHeightPx) {
+export default function usePageBreakpoints(songsData, contentHeightPx, fontFamily, fontSize, lineHeight) {
     const measureRefs = useRef([]);
     const breakpointCache = useRef(new Map());
     const [version, setVersion] = useState(0);
@@ -52,7 +55,7 @@ export default function usePageBreakpoints(songsData, contentHeightPx) {
         });
 
         if (changed) setVersion(n => n + 1);
-    }, [songsData, contentHeightPx]);
+    }, [songsData, contentHeightPx, fontFamily, fontSize, lineHeight]);
 
     const resolvedSongs = useMemo(() => {
         return songsData.map(sd => ({

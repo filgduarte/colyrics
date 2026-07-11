@@ -156,6 +156,10 @@ export default function Project() {
         return classes.join(' ');
     };
 
+    const handleTitleChange = useCallback((e) => {
+        setProject(prev => ({ ...prev, title: e.target.value }));
+    }, [setProject]);
+
     const headerAction = (
         <button
             className="project-new-song-btn"
@@ -168,6 +172,15 @@ export default function Project() {
 
     return (
         <Panel title="Project" icon={NotebookText} actions={headerAction}>
+            <div className="project-title-field">
+                <input
+                    type="text"
+                    className="project-title-input"
+                    value={project.title}
+                    onChange={handleTitleChange}
+                    placeholder="Project title"
+                />
+            </div>
             <ol
                 className="project-list"
                 onDragOver={(e) => {

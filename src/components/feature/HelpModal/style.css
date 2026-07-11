@@ -1,0 +1,48 @@
+/* ── Help modal tabs ── */
+
+.help-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--color-border-light);
+    margin: -1.25rem -1.25rem 1.25rem -1.25rem;
+    padding: 0 1.25rem;
+}
+
+.help-tab {
+    padding: 0.6rem 1rem;
+    border: none;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    color: var(--color-secondary-50);
+    font-size: 0.85rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+}
+
+.help-tab:hover {
+    color: var(--color-foreground);
+}
+
+.help-tab.active {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
+    font-weight: 600;
+}
+
+.help-tab-content h3 {
+    margin: 1rem 0 0.4rem;
+    font-size: 0.95rem;
+}
+
+.help-tab-content h3:first-child {
+    margin-top: 0;
+}
+
+.help-footer {
+    text-align: center;
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--color-border-light);
+}

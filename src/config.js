@@ -1,6 +1,6 @@
 export const config = {
     editor: {
-        defaultProjectTitle: 'Untitled Project',
+        defaultProjectTitle: 'New Project',
         defaultSongTitle: 'Untitled',
     },
     preview: {

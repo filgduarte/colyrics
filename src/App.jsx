@@ -19,6 +19,13 @@ function App() {
 		document.documentElement.classList.toggle('dark', view.theme === 'dark');
 	}, [view.theme]);
 
+	// Sync document title: "[Project Title] - Colyrics"
+	useEffect(() => {
+		document.title = project.title
+			? `${project.title} - Colyrics`
+			: 'Colyrics';
+	}, [project.title]);
+
 	const updateSettings = useCallback((newSettings) => {
 		setProject((prev) => ({
 			...prev,

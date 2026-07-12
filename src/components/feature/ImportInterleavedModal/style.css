@@ -1,0 +1,41 @@
+/* ── Import Interleaved modal ── */
+
+.import-interleaved-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.import-interleaved-textarea {
+  width: 100%;
+  min-height: 260px;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.375rem;
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-mono, 'Consolas', 'Courier New', monospace);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  resize: vertical;
+  tab-size: 2;
+}
+
+.import-interleaved-textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.import-interleaved-textarea::placeholder {
+  color: var(--color-secondary-30);
+  font-family: var(--font-mono, 'Consolas', 'Courier New', monospace);
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.import-interleaved-footer {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}

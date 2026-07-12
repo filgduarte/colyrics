@@ -1,4 +1,4 @@
-import { Download, File, FolderOpen, Printer, Settings } from 'lucide-react';
+import { ClipboardPaste, Download, File, FolderOpen, Printer, Settings } from 'lucide-react';
 import { useContext, useCallback, useState } from 'react';
 import { ProjectContext } from '../../../context';
 import { getDefaultProject } from '../../../config';
@@ -8,12 +8,14 @@ import SplitButton from '../../ui/SplitButton';
 import Button from '../../ui/Button';
 import Separator from '../../ui/Separator';
 import SettingsDialog from '../Settings';
+import ImportInterleavedModal from '../ImportInterleavedModal';
 import './style.css';
 
 export default function MenuFile() {
     const { project, setProject, currentSongIndex, setCurrentSongIndex } = useContext(ProjectContext);
     const { openFilePicker } = useFileImport(project, setProject, setCurrentSongIndex);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    const [isImportOpen, setIsImportOpen] = useState(false);
 
     const handleNew = useCallback(() => {
         const confirmed = window.confirm(
@@ -39,6 +41,7 @@ export default function MenuFile() {
         <div id="menu-file" className="app-menu">
             <Button title="New" icon={File} onClick={handleNew} />
             <Button title="Open" icon={FolderOpen} onClick={openFilePicker} />
+            <Button title="Paste chords" icon={ClipboardPaste} onClick={() => setIsImportOpen(true)} />
             <SplitButton
                 title="Save"
                 icon={Download}
@@ -64,6 +67,10 @@ export default function MenuFile() {
             <SettingsDialog
                 isOpen={isSettingsOpen}
                 onClose={() => setIsSettingsOpen(false)}
+            />
+            <ImportInterleavedModal
+                isOpen={isImportOpen}
+                onClose={() => setIsImportOpen(false)}
             />
         </div>
     );
